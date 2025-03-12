@@ -61,10 +61,8 @@
             fileToolStripMenuItem = new ToolStripMenuItem();
             openToolStripMenuItem = new ToolStripMenuItem();
             exitToolStripMenuItem = new ToolStripMenuItem();
-            viewToolStripMenuItem = new ToolStripMenuItem();
-            playToolStripMenuItem = new ToolStripMenuItem();
-            toolsToolStripMenuItem = new ToolStripMenuItem();
             welpToolStripMenuItem = new ToolStripMenuItem();
+            aboutToolStripMenuItem = new ToolStripMenuItem();
             videoPanel = new Panel();
             vlcContainer = new Panel();
             sparkleVisualizer1 = new SparkleVisualizer();
@@ -72,9 +70,9 @@
             loopBtn = new Button();
             lblTime = new Label();
             btnMute = new Button();
-            this.seekBar = new CuteMediaPlayer.CustomTrackBar();
+            seekBar = new CustomTrackBar();
             btnPlayPause = new Button();
-            this.volumeBar = new CuteMediaPlayer.CustomTrackBar();
+            volumeBar = new CustomTrackBar();
             btnPrev = new Button();
             btnNext = new Button();
             btnStop = new Button();
@@ -93,7 +91,7 @@
             // menuStrip1
             // 
             menuStrip1.BackColor = Color.FromArgb(254, 184, 195);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, viewToolStripMenuItem, playToolStripMenuItem, toolsToolStripMenuItem, welpToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, welpToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Padding = new Padding(6, 3, 0, 3);
@@ -122,29 +120,19 @@
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
-            // viewToolStripMenuItem
-            // 
-            viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            viewToolStripMenuItem.Size = new Size(44, 19);
-            viewToolStripMenuItem.Text = "View";
-            // 
-            // playToolStripMenuItem
-            // 
-            playToolStripMenuItem.Name = "playToolStripMenuItem";
-            playToolStripMenuItem.Size = new Size(41, 19);
-            playToolStripMenuItem.Text = "Play";
-            // 
-            // toolsToolStripMenuItem
-            // 
-            toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            toolsToolStripMenuItem.Size = new Size(46, 19);
-            toolsToolStripMenuItem.Text = "Tools";
-            // 
             // welpToolStripMenuItem
             // 
+            welpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { aboutToolStripMenuItem });
             welpToolStripMenuItem.Name = "welpToolStripMenuItem";
             welpToolStripMenuItem.Size = new Size(61, 19);
             welpToolStripMenuItem.Text = "Welp :_)";
+            // 
+            // aboutToolStripMenuItem
+            // 
+            aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            aboutToolStripMenuItem.Size = new Size(107, 22);
+            aboutToolStripMenuItem.Text = "About";
+            aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
             // videoPanel
             // 
@@ -201,6 +189,7 @@
             // 
             // loopBtn
             // 
+            loopBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             loopBtn.BackColor = Color.Transparent;
             loopBtn.BackgroundImage = Properties.Resources.DisabledLoopIcon;
             loopBtn.BackgroundImageLayout = ImageLayout.Zoom;
@@ -242,14 +231,20 @@
             // 
             // seekBar
             // 
+            seekBar.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             seekBar.LargeChange = 1;
             seekBar.Location = new Point(160, 10);
             seekBar.Maximum = 1000;
             seekBar.Name = "seekBar";
-            seekBar.Size = new Size(618, 45);
+            seekBar.ProgressColor = Color.DeepPink;
+            seekBar.Size = new Size(587, 45);
             seekBar.TabIndex = 4;
-            seekBar.TickStyle = TickStyle.None;
+            seekBar.Thumb = CustomTrackBar.ThumbShape.Circle;
+            seekBar.ThumbColor = Color.HotPink;
             seekBar.ThumbSize = 16;
+            seekBar.TickStyle = TickStyle.None;
+            seekBar.TrackColor = Color.FromArgb(181, 130, 138);
+            seekBar.TrackHeight = 6;
             seekBar.Scroll += seekBar_Scroll;
             // 
             // btnPlayPause
@@ -273,10 +268,15 @@
             volumeBar.Location = new Point(388, 87);
             volumeBar.Maximum = 100;
             volumeBar.Name = "volumeBar";
-            volumeBar.Size = new Size(100, 22);
+            volumeBar.ProgressColor = Color.DeepPink;
+            volumeBar.Size = new Size(98, 22);
             volumeBar.TabIndex = 3;
-            volumeBar.TickStyle = TickStyle.None;
+            volumeBar.Thumb = CustomTrackBar.ThumbShape.Circle;
+            volumeBar.ThumbColor = Color.HotPink;
             volumeBar.ThumbSize = 16;
+            volumeBar.TickStyle = TickStyle.None;
+            volumeBar.TrackColor = Color.FromArgb(181, 130, 138);
+            volumeBar.TrackHeight = 6;
             volumeBar.Value = 100;
             volumeBar.Scroll += volumeBar_Scroll;
             // 
@@ -329,6 +329,7 @@
             // 
             // btnChangeTheme
             // 
+            btnChangeTheme.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnChangeTheme.BackgroundImage = Properties.Resources.ThemeIcon;
             btnChangeTheme.BackgroundImageLayout = ImageLayout.Zoom;
             btnChangeTheme.Cursor = Cursors.Hand;
@@ -373,6 +374,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
             Name = "Form1";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "✨ Cute Media Player ✨";
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
@@ -397,9 +399,6 @@
         private Button btnStop;
         private CuteMediaPlayer.CustomTrackBar volumeBar;
         private ToolStripMenuItem fileToolStripMenuItem;
-        private ToolStripMenuItem viewToolStripMenuItem;
-        private ToolStripMenuItem playToolStripMenuItem;
-        private ToolStripMenuItem toolsToolStripMenuItem;
         private ToolStripMenuItem welpToolStripMenuItem;
         private ToolStripMenuItem openToolStripMenuItem;
         private ToolStripMenuItem exitToolStripMenuItem;
@@ -413,5 +412,6 @@
         private ToolTip LoopBtnToolTip;
         private ToolTip ChangeThemeBtnToolTip;
         private ToolTip MuteBtnToolTip;
+        private ToolStripMenuItem aboutToolStripMenuItem;
     }
 }

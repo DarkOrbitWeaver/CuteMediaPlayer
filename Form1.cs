@@ -11,7 +11,6 @@ namespace CuteMediaPlayer
         private Random random = new Random();
         private Timer uiTimer;
 
-
         // playlist mangment 
         private List<string> playlist = new List<string>();
         private int currentTrackIndex = -1;
@@ -460,7 +459,7 @@ namespace CuteMediaPlayer
             {
                 isMuted = true;
             }
-            else if (volumeBar.Value >=1 )
+            else if (volumeBar.Value >= 1)
             {
                 isMuted = false;
             }
@@ -851,10 +850,11 @@ namespace CuteMediaPlayer
         }
 
 
-
-
-
-
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            HelpForm aboutDialogueWindow = new HelpForm();
+            aboutDialogueWindow.ShowDialog();
+        }
 
         private void LogVisualizerState(string action)
         {
@@ -865,6 +865,7 @@ namespace CuteMediaPlayer
             Console.WriteLine($"  visualizer.IsIdleMode: {sparkleVisualizer1.IsIdleMode}");
             Console.WriteLine($"  currentTrackIndex: {currentTrackIndex}");
         }
+
 
     }
 }
