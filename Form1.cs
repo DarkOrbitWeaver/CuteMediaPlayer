@@ -16,13 +16,23 @@ namespace CuteMediaPlayer
         private int currentTrackIndex = -1;
 
         // to toggle audio visualizer
-        private bool isAudioFile = false; // Add this class-level variable
+        private bool isAudioFile = false; 
 
         // loop
         private bool loopEnabled = false;
 
         // visualizer theme
         private int lastVolumeBarValue = 100;
+
+        // store user settings
+        private List<Playlist> allPlaylists = new List<Playlist>();
+        private Playlist currentPlaylist = new Playlist { Name = "Default" };
+        private string playlistsFolder = Path.Combine(Application.StartupPath, "Playlists");
+
+        // shuffle 
+        private List<string> originalPlaylistOrder = new List<string>();
+        private bool isShuffled = false;
+
 
         public Form1()
         {
@@ -31,15 +41,7 @@ namespace CuteMediaPlayer
             InitializeMediaPlayer();
             InitializeAudioSampling();
 
-            // Set up event handlers for disabled state changes
-            btnPlayPause.EnabledChanged += (s, e) => UpdateButtonImages();
-            btnStop.EnabledChanged += (s, e) => UpdateButtonImages();
-            btnPrev.EnabledChanged += (s, e) => UpdateButtonImages();
-            btnNext.EnabledChanged += (s, e) => UpdateButtonImages();
-            btnChangeTheme.EnabledChanged += (s, e) => UpdateButtonImages();
-
             // set up other ones to handle the change of button size and click stuff kinda like animations
-            // Add this to the InitializeMediaPlayer method after creating the buttons
             SetupButtonAppearance(btnPlayPause);
             SetupButtonAppearance(btnStop);
             SetupButtonAppearance(btnPrev);
@@ -47,6 +49,10 @@ namespace CuteMediaPlayer
             SetupButtonAppearance(btnChangeTheme);
             SetupButtonAppearance(btnMute);
             SetupButtonAppearance(loopBtn);
+            SetupButtonAppearance(shuffle);
+            SetupButtonAppearance(openPlaylist);
+            SetupButtonAppearance(btnAddCurrentToPlaylist);
+
 
 
             // 🕒 Timer to update UI elements (seek bar/time label)
@@ -59,11 +65,21 @@ namespace CuteMediaPlayer
                     // Check if media player exists and has valid media
                     if (mediaPlayer == null || !mediaPlayer.IsPlaying) return;
 
+                    // Check if we have a valid time/length
+                    if (mediaPlayer.Length <= 0) return;
+
                     // Only update seek bar if user isn't dragging it
                     if (!seekBar.Capture)
                     {
                         // Convert media position, seek bar value (0-1000)
-                        seekBar.Value = (int)(mediaPlayer.Position * seekBar.Maximum);
+                        try
+                        {
+                            seekBar.Value = (int)(mediaPlayer.Position * seekBar.Maximum);
+                        }
+                        catch
+                        {
+                            // Ignore any seek bar update errors
+                        }
                     }
 
                     // 3️⃣ Always update time display
@@ -145,27 +161,41 @@ namespace CuteMediaPlayer
                         // Using BeginInvoke to avoid threading issues
                         this.BeginInvoke(new Action(() =>
                         {
-                            // Check if loop is enabled
-                            if (loopEnabled && playlist.Count > 0)
+                            try
                             {
-                                // Replay the current file
-                                mediaPlayer.Play(new FileInfo(playlist[currentTrackIndex]));
-                                btnPlayPause.BackgroundImage = Properties.Resources.PauseIcon;
+                                // Check if loop is enabled
+                                if (loopEnabled && playlist.Count > 0)
+                                {
+                                    // Replay the current file
+                                    mediaPlayer.Play(new FileInfo(playlist[currentTrackIndex]));
+                                    btnPlayPause.BackgroundImage = Properties.Resources.PauseIcon;
+                                }
+                                else if (currentTrackIndex < playlist.Count - 1)
+                                {
+                                    // Play next track if available
+                                    currentTrackIndex++;
+                                    PlayCurrentTrack();
+                                }
+                                else
+                                {
+                                    // We're at the end of the playlist
+                                    mediaPlayer.Stop();
+                                    mediaPlayer.Position = 0; // Reset position
+                                    seekBar.Value = 0;
+                                    btnPlayPause.BackgroundImage = Properties.Resources.PlayIcon;
+
+                                    // Show idle visualizer
+                                    UpdateVisualizerVisibility();
+                                }
+
+                                // Reset audio for next playback
+                                mediaPlayer.Audio.Volume = volumeBar.Value;
+                                mediaPlayer.Audio.IsMute = false;
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                mediaPlayer.Stop();
-                                mediaPlayer.Position = 0; // Reset position
-                                seekBar.Value = 0;
-                                btnPlayPause.BackgroundImage = Properties.Resources.PlayIcon;
-
-                                // Show idle visualizer
-                                UpdateVisualizerVisibility();
+                                Console.WriteLine($"Error in EndReached action: {ex.Message}");
                             }
-
-                            // Reset audio for next playback
-                            mediaPlayer.Audio.Volume = volumeBar.Value;
-                            mediaPlayer.Audio.IsMute = false;
                         }));
                     }
                     catch (Exception ex)
@@ -174,8 +204,6 @@ namespace CuteMediaPlayer
                     }
                 };
 
-
-                // Add this in InitializeMediaPlayer() after other event handlers
                 mediaPlayer.Playing += (s, e) =>
                 {
                     try
@@ -379,35 +407,39 @@ namespace CuteMediaPlayer
         {
             try
             {
+                if (mediaPlayer == null) return;
+
                 if (mediaPlayer.IsPlaying)
                 {
                     mediaPlayer.Pause();
-                    //btnPlayPause.Text = "Play";
                     btnPlayPause.BackgroundImage = Properties.Resources.PlayIcon;
                 }
                 else
                 {
                     // If we have a file selected in the playlist
-                    if (currentTrackIndex != -1)
+                    if (currentTrackIndex != -1 && currentTrackIndex < playlist.Count)
                     {
+                        // Check if file exists
+                        if (!File.Exists(playlist[currentTrackIndex]))
+                        {
+                            MessageBox.Show($"File not found: {Path.GetFileName(playlist[currentTrackIndex])}");
+                            return;
+                        }
+
                         // Check if we're at the end by looking at position
                         if (mediaPlayer.Position <= 0.01 || mediaPlayer.Position >= 0.99)
                         {
-                            if (playlist.Count > 0 && currentTrackIndex < playlist.Count)
-                            {
-                                // Reload the current file
-                                mediaPlayer.Play(new FileInfo(playlist[currentTrackIndex]));
-                            }
+                            // Reload the current file
+                            mediaPlayer.Play(new FileInfo(playlist[currentTrackIndex]));
                         }
                         else
                         {
                             // Just resume if paused in the middle
                             mediaPlayer.Play();
                         }
-                    }
-                    btnPlayPause.BackgroundImage = Properties.Resources.PauseIcon;
 
-                    //btnPlayPause.Text = "Pause";
+                        btnPlayPause.BackgroundImage = Properties.Resources.PauseIcon;
+                    }
                 }
 
                 // Use our consolidated method with force refresh
@@ -419,7 +451,9 @@ namespace CuteMediaPlayer
             }
 
             UpdateButtonStates();
+            UpdateButtonImages();
         }
+
 
         private void btnStop_Click(object sender, EventArgs e)
         {
@@ -447,6 +481,7 @@ namespace CuteMediaPlayer
             }
 
             UpdateButtonStates();
+            UpdateButtonImages();
         }
 
         private void volumeBar_Scroll(object sender, EventArgs e)
@@ -482,10 +517,21 @@ namespace CuteMediaPlayer
 
         private void UpdateTimeDisplay()
         {
-            // ⏱️ Format current time and total time
-            TimeSpan currentTime = TimeSpan.FromMilliseconds(mediaPlayer.Time);
-            TimeSpan totalTime = TimeSpan.FromMilliseconds(mediaPlayer.Length);
-            lblTime.Text = $"{currentTime:mm\\:ss} / {totalTime:mm\\:ss}";
+            try
+            {
+                // ⏱️ Format current time and total time
+                if (mediaPlayer == null) return;
+
+                TimeSpan currentTime = TimeSpan.FromMilliseconds(mediaPlayer.Time);
+                TimeSpan totalTime = TimeSpan.FromMilliseconds(mediaPlayer.Length);
+                lblTime.Text = $"{currentTime:mm\\:ss} / {totalTime:mm\\:ss}";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating time display: {ex.Message}");
+                // Set a default value if there's an error
+                lblTime.Text = "0:00 / 0:00";
+            }
         }
 
         // Call this method when opening a file
@@ -560,7 +606,7 @@ namespace CuteMediaPlayer
             // switch the mute icon
             if (isMuted)
             {
-                btnMute.BackgroundImage = Properties.Resources.DisabledMuteIcon;
+                btnMute.BackgroundImage = Properties.Resources.DisabledLoopIcon;
             }
             else
             {
@@ -575,29 +621,42 @@ namespace CuteMediaPlayer
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                playlist = dialog.FileNames.ToList();
+                // 🗑️ Clear existing playlist and add new files
+                currentPlaylist.Tracks.Clear();
+                var validFiles = dialog.FileNames.Where(f => File.Exists(f)).ToArray();
+                currentPlaylist.Tracks.AddRange(validFiles);
+
+                // 🔄 Sync playlist reference (if still needed elsewhere)
+                playlist = currentPlaylist.Tracks;
+
+                // 🎵 Initialize playback
                 currentTrackIndex = 0;
+                UpdateFileType(); // Detect audio/video type
+                UpdateWindowTitle(); // Update title bar
 
-                // Update file type
-                UpdateFileType();
+                // 📋 Update playlist UI
+                listPlaylist.Items.Clear();
+                listPlaylist.Items.AddRange(validFiles.Select(Path.GetFileName).ToArray());
 
-                // Update window title
-                UpdateWindowTitle();
+                // 💾 Save to disk
+                SaveAllPlaylists();
 
-                // Set visualizer state
-                UpdateVisualizerVisibility(false); // Don't refresh yet
+                // ▶️ Start playback if files were loaded
+                if (currentPlaylist.Tracks.Count > 0)
+                {
+                    mediaPlayer.Play(new FileInfo(currentPlaylist.Tracks[currentTrackIndex]));
+                    btnPlayPause.BackgroundImage = Properties.Resources.PauseIcon;
 
-                // Play the file
-                mediaPlayer.Play(new FileInfo(playlist[currentTrackIndex]));
-                btnPlayPause.BackgroundImage = Properties.Resources.PauseIcon;
-
-                // Set audio settings
-                mediaPlayer.Audio.Volume = volumeBar.Value;
-                isMuted = false;
-                btnMute.BackgroundImage = Properties.Resources.MuteIcon;
+                    // 🔊 Reset audio settings
+                    mediaPlayer.Audio.Volume = volumeBar.Value;
+                    isMuted = false;
+                    btnMute.BackgroundImage = Properties.Resources.MuteIcon;
+                }
             }
 
+            // 🔄 Update button states (play/stop etc.)
             UpdateButtonStates();
+            UpdateButtonImages();
         }
 
         private void btnNext_Click(object sender, EventArgs e)
@@ -609,6 +668,9 @@ namespace CuteMediaPlayer
             mediaPlayer.Play(new FileInfo(playlist[currentTrackIndex]));
             btnPlayPause.BackgroundImage = Properties.Resources.PauseIcon;
             UpdateVisualizerVisibility();
+            SyncPlaylistToUI();
+            UpdateButtonStates();
+            UpdateButtonImages();
         }
 
         private void btnPrev_Click(object sender, EventArgs e)
@@ -620,6 +682,9 @@ namespace CuteMediaPlayer
             mediaPlayer.Play(new FileInfo(playlist[currentTrackIndex]));
             btnPlayPause.BackgroundImage = Properties.Resources.PauseIcon;
             UpdateVisualizerVisibility();
+            SyncPlaylistToUI();
+            UpdateButtonStates();
+            UpdateButtonImages();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -856,16 +921,499 @@ namespace CuteMediaPlayer
             aboutDialogueWindow.ShowDialog();
         }
 
-        private void LogVisualizerState(string action)
+        //private void LogVisualizerState(string action)
+        //{
+        //    Console.WriteLine($"Action: {action}");
+        //    Console.WriteLine($"  isAudioFile: {isAudioFile}");
+        //    Console.WriteLine($"  mediaPlayer.IsPlaying: {mediaPlayer?.IsPlaying}");
+        //    Console.WriteLine($"  visualizer.Visible: {sparkleVisualizer1.Visible}");
+        //    Console.WriteLine($"  visualizer.IsIdleMode: {sparkleVisualizer1.IsIdleMode}");
+        //    Console.WriteLine($"  currentTrackIndex: {currentTrackIndex}");
+        //}
+
+        // playlist 
+        public class Playlist
         {
-            Console.WriteLine($"Action: {action}");
-            Console.WriteLine($"  isAudioFile: {isAudioFile}");
-            Console.WriteLine($"  mediaPlayer.IsPlaying: {mediaPlayer?.IsPlaying}");
-            Console.WriteLine($"  visualizer.Visible: {sparkleVisualizer1.Visible}");
-            Console.WriteLine($"  visualizer.IsIdleMode: {sparkleVisualizer1.IsIdleMode}");
-            Console.WriteLine($"  currentTrackIndex: {currentTrackIndex}");
+            public string Name { get; set; }
+            public List<string> Tracks { get; set; } = new List<string>();
+        }
+
+        private void SaveAllPlaylists()
+        {
+            // Create folder if missing
+            Directory.CreateDirectory(playlistsFolder);
+
+            // Save each playlist
+            foreach (var pl in allPlaylists)
+            {
+                File.WriteAllLines(Path.Combine(playlistsFolder, $"{pl.Name}.m3u"), pl.Tracks);
+            }
+        }
+
+        private void LoadAllPlaylists()
+        {
+            allPlaylists.Clear();
+
+            // Create directory if it doesn't exist
+            Directory.CreateDirectory(playlistsFolder);
+
+            foreach (var file in Directory.GetFiles(playlistsFolder, "*.m3u"))
+            {
+                var pl = new Playlist
+                {
+                    Name = Path.GetFileNameWithoutExtension(file),
+                    Tracks = File.ReadAllLines(file).Where(File.Exists).ToList()
+                };
+                allPlaylists.Add(pl);
+            }
+
+            listSavedPlaylists.Items.AddRange(allPlaylists.Select(p => p.Name).ToArray());
+        }
+
+        private void NewPlaylist_Click(object sender, EventArgs e)
+        {
+            // 🎀 Use our cute dialog instead of default InputBox
+            using (var nameDialog = new NewPlaylistDialog())
+            {
+                if (nameDialog.ShowDialog() != DialogResult.OK) return;
+
+                string name = nameDialog.PlaylistName.Trim();
+                if (string.IsNullOrWhiteSpace(name)) return;
+
+                // Create empty playlist 
+                var newPl = new Playlist { Name = name };
+                allPlaylists.Add(newPl);
+                listSavedPlaylists.Items.Add(name);
+
+                // ❓ Ask to add files (we'll keep MessageBox for now)
+                DialogResult result = MessageBox.Show("Add files to this playlist now?", "Add Files", MessageBoxButtons.YesNo);
+
+                if (result == DialogResult.Yes)
+                {
+                    using OpenFileDialog fileDialog = new OpenFileDialog();
+                    fileDialog.Title = "Select Media Files 🎧"; // Add cute emoji
+                    fileDialog.Multiselect = true;
+                    fileDialog.Filter = "Media Files|*.mp3;*.mp4;*.avi;*.mkv";
+
+                    if (fileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        //  Add files (no duplicates) 
+                        foreach (string file in fileDialog.FileNames)
+                        {
+                            if (!newPl.Tracks.Contains(file))
+                            {
+                                newPl.Tracks.Add(file);
+                            }
+                        }
+                    }
+                }
+
+                // 💾 Save changes 
+                SaveAllPlaylists();
+            }
         }
 
 
+        // this plays the selected track
+        private void listPlaylist_DoubleClick(object sender, EventArgs e)
+        {
+            if (listPlaylist.SelectedIndex != -1)
+            {
+                // Simply set currentTrackIndex to the selected index
+                currentTrackIndex = listPlaylist.SelectedIndex;
+                PlayCurrentTrack();
+            }
+        }
+
+
+        private void PlayCurrentTrack()
+        {
+            try
+            {
+                // Make sure currentTrackIndex is valid
+                if (currentTrackIndex < 0 || currentTrackIndex >= currentPlaylist.Tracks.Count)
+                {
+                    Console.WriteLine("Invalid track index!");
+                    return;
+                }
+
+                // Get file to play
+                string fileToPlay = currentPlaylist.Tracks[currentTrackIndex];
+
+                // Make sure file exists
+                if (!File.Exists(fileToPlay))
+                {
+                    MessageBox.Show($"File not found: {Path.GetFileName(fileToPlay)}");
+                    return;
+                }
+
+                // Update UI and play the file
+                UpdateFileType();
+                mediaPlayer.Play(new FileInfo(fileToPlay));
+                btnPlayPause.BackgroundImage = Properties.Resources.PauseIcon;
+                UpdateVisualizerVisibility(true);
+                UpdateWindowTitle();
+
+                // Highlight current track in playlist
+                for (int i = 0; i < listPlaylist.Items.Count; i++)
+                {
+                    if (i == currentTrackIndex)
+                    {
+                        listPlaylist.SelectedIndex = i;
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in PlayCurrentTrack: {ex.Message}");
+            }
+        }
+
+
+        private void removeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listPlaylist.SelectedIndex == -1) return;
+
+            // Remove from both playlist and listbox
+            playlist.RemoveAt(listPlaylist.SelectedIndex);
+            listPlaylist.Items.RemoveAt(listPlaylist.SelectedIndex);
+        }
+
+        // shuffle 
+        private void shuffle_Click(object sender, EventArgs e)
+        {
+            isShuffled = !isShuffled;
+
+            if (isShuffled)
+            {
+                if (originalPlaylistOrder.Count == 0)
+                    originalPlaylistOrder = new List<string>(currentPlaylist.Tracks);
+
+                // Shuffle currentPlaylist.Tracks directly
+                currentPlaylist.Tracks = currentPlaylist.Tracks
+                    .OrderBy(x => random.Next())
+                    .ToList();
+
+                playlist = currentPlaylist.Tracks; // Sync reference
+                shuffle.BackgroundImage = Properties.Resources.ShuffleIcon;
+
+            }
+            else
+            {
+                currentPlaylist.Tracks = new List<string>(originalPlaylistOrder);
+                playlist = currentPlaylist.Tracks; // Sync reference    
+                shuffle.BackgroundImage = Properties.Resources.DisabledShuffleIcon;
+
+            }
+
+            listPlaylist.Items.Clear();
+            listPlaylist.Items.AddRange(currentPlaylist.Tracks.Select(Path.GetFileName).ToArray());
+            SaveAllPlaylists();
+            SyncPlaylistToUI();
+        }
+
+
+        private void openPlaylist_Click(object sender, EventArgs e)
+        {
+            // 🎵 Toggle playlist visibility
+            panelPlaylist.Visible = !panelPlaylist.Visible;
+        }
+
+
+        private void CleanInvalidPaths()
+        {
+
+            Directory.CreateDirectory(playlistsFolder);
+
+            // Remove missing files from current playlist
+            currentPlaylist.Tracks = currentPlaylist.Tracks
+                .Where(File.Exists)
+                .ToList();
+
+            listPlaylist.Items.Clear();
+            listPlaylist.Items.AddRange(currentPlaylist.Tracks.Select(Path.GetFileName).ToArray());
+
+            // Show warning if many files missing
+            if (currentPlaylist.Tracks.Count < listPlaylist.Items.Count)
+            {
+                MessageBox.Show("Some files could not be found and were removed");
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            try
+            {
+                // Create playlists folder if missing
+                Directory.CreateDirectory(playlistsFolder);
+
+                // Load playlists
+                LoadAllPlaylists();
+
+                // Clean invalid paths
+                CleanInvalidPaths();
+
+                // Restore volume
+                if (Properties.Settings.Default.LastVolume > 0 &&
+                    Properties.Settings.Default.LastVolume <= 100)
+                {
+                    volumeBar.Value = Properties.Settings.Default.LastVolume;
+                }
+                else
+                {
+                    volumeBar.Value = 80; // Default value
+                }
+
+                // Apply volume to media player
+                if (mediaPlayer != null)
+                {
+                    mediaPlayer.Audio.Volume = volumeBar.Value;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in Form_Load: {ex.Message}");
+            }
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            SaveAllPlaylists();
+            Properties.Settings.Default.LastVolume = volumeBar.Value;
+            Properties.Settings.Default.Save();
+        }
+
+        // playlist managment
+        private void menuSavedPlaylists_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            deleteToolStripMenuItem.Enabled = (listSavedPlaylists.SelectedIndex != -1);
+        }
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listSavedPlaylists.SelectedIndex == -1) return;
+
+            // Confirm deletion with cute message 💬
+            DialogResult result = MessageBox.Show("Delete this playlist forever?",
+                "So sad... 😢",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                var pl = allPlaylists[listSavedPlaylists.SelectedIndex];
+
+                // Delete file
+                File.Delete(Path.Combine(playlistsFolder, $"{pl.Name}.m3u"));
+
+                // Update UI
+                allPlaylists.RemoveAt(listSavedPlaylists.SelectedIndex);
+                listSavedPlaylists.Items.RemoveAt(listSavedPlaylists.SelectedIndex);
+                SaveAllPlaylists();
+            }
+        }
+
+        // okay when i double click a playlist it switch to it and load it 
+        private void listSavedPlaylists_DoubleClick(object sender, EventArgs e)
+        {
+            if (listSavedPlaylists.SelectedIndex == -1) return;
+
+            // Load selected playlist
+            currentPlaylist = allPlaylists[listSavedPlaylists.SelectedIndex];
+            playlist = currentPlaylist.Tracks;
+
+            // 🎵 Auto-play first track if playlist isn't empty
+            if (playlist.Count > 0)
+            {
+                currentTrackIndex = 0; // Start from first track
+                PlayCurrentTrack();   // Play it!
+            }
+
+            // Update UI
+            listPlaylist.Items.Clear();
+            listPlaylist.Items.AddRange(currentPlaylist.Tracks.Select(Path.GetFileName).ToArray());
+            tabControl1.SelectedTab = tabCurrent;
+            isShuffled = false;
+            shuffle.BackColor = Color.FromArgb(254, 184, 195);
+            SyncPlaylistToUI();
+            UpdateButtonStates();
+            UpdateButtonImages();
+        }
+
+        // when i right click song and play it
+        private void playToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listPlaylist.SelectedIndex != -1)
+            {
+                // Update current track index
+                currentTrackIndex = listPlaylist.SelectedIndex;
+
+                // Play the selected track
+                PlayCurrentTrack();
+
+                // Update UI
+                UpdateButtonStates();
+                UpdateButtonImages();
+            }
+        }
+
+        // when i double click a song from the playlist
+        private void listPlaylist_Click(object sender, EventArgs e)
+        {
+            if (listPlaylist.SelectedIndex != -1)
+            {
+                // Update current track index
+                currentTrackIndex = listPlaylist.SelectedIndex;
+
+                // Play the selected track
+                PlayCurrentTrack();
+
+                // Update UI
+                UpdateButtonStates();
+            }
+        }
+
+        // keep the playlist in sync
+        private void SyncPlaylistToUI()
+        {
+            try
+            {
+                // Clear the playlist UI
+                listPlaylist.Items.Clear();
+
+                // Add all tracks from current playlist
+                foreach (string track in currentPlaylist.Tracks)
+                {
+                    listPlaylist.Items.Add(Path.GetFileName(track));
+                }
+
+                // Make sure playlist reference is in sync
+                playlist = currentPlaylist.Tracks;
+
+                // Highlight current track if playing
+                if (currentTrackIndex >= 0 && currentTrackIndex < listPlaylist.Items.Count)
+                {
+                    listPlaylist.SelectedIndex = currentTrackIndex;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error syncing playlist: {ex.Message}");
+            }
+        }
+
+
+        // I actually forgot what does this do anyway but its somethings in the playlist buttons lol
+        private Playlist SelectPlaylistDialog()
+        {
+            // No playlists exist
+            if (allPlaylists.Count == 0)
+            {
+                MessageBox.Show("Create a playlist first!");
+                return null;
+            }
+
+            using (PlaylistDialog dialog = new PlaylistDialog())
+            {
+                // Add playlist names to listbox
+                dialog.PlaylistListBox.Items.AddRange(allPlaylists.Select(p => p.Name).ToArray());
+
+                // Show the dialog
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    //  Check if user actually selected something
+                    if (dialog.PlaylistListBox.SelectedIndex == -1)
+                    {
+                        MessageBox.Show("Please select a playlist first!");
+                        return null;
+                    }
+
+                    // Return safe selected playlist
+                    return allPlaylists[dialog.PlaylistListBox.SelectedIndex];
+                }
+            }
+            return null;
+        }
+
+        // adding songs to a playlist via the right click
+        private void addToPlaylistToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listPlaylist.SelectedIndex == -1) return;
+
+            // Get selected song
+            string selectedFile = currentPlaylist.Tracks[listPlaylist.SelectedIndex];
+
+            // Select target playlist
+            Playlist target = SelectPlaylistDialog();
+            if (target == null) return;
+
+            // Check for existing
+            if (!target.Tracks.Contains(selectedFile))
+            {
+                target.Tracks.Add(selectedFile);
+                SaveAllPlaylists();
+                MessageBox.Show("Added to playlist!");
+            }
+            else
+            {
+                MessageBox.Show("Song already exists in this playlist!");
+            }
+        }
+        // adding songs to a playlist
+        private void btnAddToPlaylist_Click(object sender, EventArgs e)
+        {
+            // Check if current playlist has tracks
+            if (currentPlaylist.Tracks.Count == 0)
+            {
+                MessageBox.Show("Current playlist is empty!");
+                return;
+            }
+
+            // Let user choose a target playlist
+            Playlist target = SelectPlaylistDialog();
+            if (target == null) return; // User canceled
+
+            // Add each track from current playlist to target (skip duplicates)
+            foreach (string file in currentPlaylist.Tracks)
+            {
+                if (!target.Tracks.Contains(file))
+                {
+                    target.Tracks.Add(file);
+                }
+            }
+
+            // Save changes
+            SaveAllPlaylists();
+            MessageBox.Show($"Added to '{target.Name}'! (¬_¬\")");
+        }
+
+        private void btnAddCurrentToPlaylist_Click(object sender, EventArgs e)
+        {
+            //  Check if any track is playing
+            if (currentTrackIndex == -1 || playlist.Count == 0)
+            {
+                MessageBox.Show("No track is playing!");
+                return;
+            }
+
+            //  Get current track
+            string currentFile = playlist[currentTrackIndex];
+
+            //  Select target playlist
+            Playlist target = SelectPlaylistDialog();
+            if (target == null) return;
+
+            //  Check if already exists
+            if (!target.Tracks.Contains(currentFile))
+            {
+                target.Tracks.Add(currentFile);
+                SaveAllPlaylists();
+                MessageBox.Show("Added current song to playlist!");
+            }
+            else
+            {
+                MessageBox.Show("Song already exists in this playlist!");
+            }
+        }
     }
 }

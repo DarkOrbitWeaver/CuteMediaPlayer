@@ -51,9 +51,6 @@
             label1.Size = new Size(275, 75);
             label1.TabIndex = 1;
             label1.Text = "Hey, well heey :O\r\nif you have any idea please tell me \r\nill be happy to try them(●'◡'●)";
-            label1.MouseDown += HelpForm_MouseDown;
-            label1.MouseMove += HelpForm_MouseMove;
-            label1.MouseUp += HelpForm_MouseUp;
             // 
             // HelpForm
             // 
@@ -69,9 +66,6 @@
             Name = "HelpForm";
             StartPosition = FormStartPosition.CenterParent;
             Text = "HelpForm";
-            MouseDown += HelpForm_MouseDown;
-            MouseMove += HelpForm_MouseMove;
-            MouseUp += HelpForm_MouseUp;
             ResumeLayout(false);
         }
 
