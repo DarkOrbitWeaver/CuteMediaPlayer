@@ -33,7 +33,7 @@ namespace CuteMediaPlayer
         private List<string> originalPlaylistOrder = new List<string>();
         private bool isShuffled = false;
 
-
+        string FilesFilter = "Media Files|*.mp4;*.mp3;*.avi;*.mkv;*.wav;*.m4a;*.aac;*.flac;*.ogg;*.wma";
         public Form1()
         {
             InitializeComponent();
@@ -606,7 +606,7 @@ namespace CuteMediaPlayer
             // switch the mute icon
             if (isMuted)
             {
-                btnMute.BackgroundImage = Properties.Resources.DisabledLoopIcon;
+                btnMute.BackgroundImage = Properties.Resources.DisabledMuteIcon;
             }
             else
             {
@@ -616,7 +616,7 @@ namespace CuteMediaPlayer
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Filter = "Media Files|*.mp4;*.mp3;*.avi;*.mkv;*.wav;*.m4a;*.aac;*.flac;*.ogg;*.wma";
+            dialog.Filter = FilesFilter;
             dialog.Multiselect = true;
 
             if (dialog.ShowDialog() == DialogResult.OK)
@@ -742,18 +742,17 @@ namespace CuteMediaPlayer
             try
             {
                 bool mediaLoaded = currentTrackIndex >= 0 && playlist.Count > 0;
-
-                // Disable/enable playback buttons based on media loaded state
                 btnPlayPause.Enabled = mediaLoaded;
+                UpdateButtonImages(); 
                 btnStop.Enabled = mediaLoaded;
+                UpdateButtonImages(); 
                 btnNext.Enabled = mediaLoaded && playlist.Count > 1;
+                UpdateButtonImages(); 
                 btnPrev.Enabled = mediaLoaded && playlist.Count > 1;
+                UpdateButtonImages(); 
                 seekBar.Enabled = mediaLoaded;
-
-                // Only keep theme button in audio mode
+                UpdateButtonImages(); 
                 btnChangeTheme.Enabled = isAudioFile;
-
-                // Update button images based on enabled state
                 UpdateButtonImages();
             }
             catch (Exception ex)
@@ -993,7 +992,7 @@ namespace CuteMediaPlayer
                     using OpenFileDialog fileDialog = new OpenFileDialog();
                     fileDialog.Title = "Select Media Files 🎧"; // Add cute emoji
                     fileDialog.Multiselect = true;
-                    fileDialog.Filter = "Media Files|*.mp3;*.mp4;*.avi;*.mkv";
+                    fileDialog.Filter = FilesFilter;
 
                     if (fileDialog.ShowDialog() == DialogResult.OK)
                     {
