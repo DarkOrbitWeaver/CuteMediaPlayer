@@ -4,6 +4,12 @@
     <_LastSelectedProfileId>C:\DarkOrbitWeaver\CuteMediaPlayer\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Update="AudioVisualizer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ButtonEffects.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="CustomTrackBar.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -13,10 +19,16 @@
     <Compile Update="HelpForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="MediaPlayerCore.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="NewPlaylistDialog.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="PlaylistDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="PlaylistManager.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="SparkleVisualizer .cs">
