@@ -92,6 +92,7 @@ namespace CuteMediaPlayer
                         // Beat detected!
                         currentBeatStrength = Math.Min(1.0f, (instantEnergy - avgEnergy) * 2.5f);
                         lastBeatTime = time;
+
                     }
                     else
                     {
@@ -133,6 +134,11 @@ namespace CuteMediaPlayer
                         {
                             visData[i] *= 1.0f + (currentBeatStrength * 0.5f);
                         }
+                        // for the dancing girl to change dance
+                        if (random.Next(3) == 2)
+                        {
+                            switchFrameSet = true;
+                        }
                     }
 
                     // Send the improved data to the visualizer
@@ -157,6 +163,8 @@ namespace CuteMediaPlayer
                 sparkleVisualizer1.Visible = true;
                 sparkleVisualizer1.IsIdleMode = !isPlaying; // idle when paused, active when playing
                 sparkleVisualizer1.BringToFront();
+                dancingGirlPictureBox.BringToFront();
+                dancingGirlPictureBox.Visible = isPlaying;
                 //sparkleVisualizer1.UseIdleWallpaper = true;
             }
             // For video files, hide visualizer completely
@@ -164,12 +172,14 @@ namespace CuteMediaPlayer
             {
                 sparkleVisualizer1.Visible = false;
                 sparkleVisualizer1.UseIdleWallpaper = false;
+                dancingGirlPictureBox.Visible = false;
             }
             // If nothing is loaded, show idle visualizer
             else
             {
                 sparkleVisualizer1.Visible = true;
                 sparkleVisualizer1.IsIdleMode = true;
+                dancingGirlPictureBox.Visible = false;
                 sparkleVisualizer1.BringToFront();
                 //sparkleVisualizer1.UseIdleWallpaper = true;
             }
@@ -185,6 +195,7 @@ namespace CuteMediaPlayer
                     this.Refresh();
                 }
             }
+
         }
 
 
@@ -193,12 +204,13 @@ namespace CuteMediaPlayer
             // Change color scheme
             sparkleVisualizer1.ChangeColorScheme();
             sparkleVisualizer1.Visible = true;
-
+            dancingGirlPictureBox.Visible = true;
             // Force redraw
             sparkleVisualizer1.RefreshVisuals();
 
             // Make sure it's in front
             sparkleVisualizer1.BringToFront();
+            dancingGirlPictureBox.BringToFront();
         }
 
 

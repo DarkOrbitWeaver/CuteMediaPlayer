@@ -36,6 +36,9 @@
                     {
                         components.Dispose();
                     }
+
+                    DisposeOfDancingGirlFrames();
+
                 }
                 catch (Exception ex)
                 {
@@ -65,6 +68,7 @@
             aboutToolStripMenuItem = new ToolStripMenuItem();
             videoPanel = new Panel();
             vlcContainer = new Panel();
+            dancingGirlPictureBox = new PictureBox();
             panelPlaylist = new Panel();
             tabControl1 = new TabControl();
             tabCurrent = new TabPage();
@@ -103,6 +107,7 @@
             menuStrip1.SuspendLayout();
             videoPanel.SuspendLayout();
             vlcContainer.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dancingGirlPictureBox).BeginInit();
             panelPlaylist.SuspendLayout();
             tabControl1.SuspendLayout();
             tabCurrent.SuspendLayout();
@@ -121,7 +126,7 @@
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Padding = new Padding(7, 4, 0, 4);
-            menuStrip1.Size = new Size(896, 27);
+            menuStrip1.Size = new Size(982, 27);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -162,34 +167,47 @@
             // 
             // videoPanel
             // 
-            videoPanel.BackColor = Color.MediumSlateBlue;
+            videoPanel.BackColor = Color.Transparent;
             videoPanel.Controls.Add(vlcContainer);
             videoPanel.Controls.Add(controlPanel);
             videoPanel.Dock = DockStyle.Fill;
             videoPanel.Location = new Point(0, 27);
             videoPanel.Margin = new Padding(3, 4, 3, 4);
             videoPanel.Name = "videoPanel";
-            videoPanel.Size = new Size(896, 561);
+            videoPanel.Size = new Size(982, 561);
             videoPanel.TabIndex = 1;
             // 
             // vlcContainer
             // 
-            vlcContainer.BackColor = Color.Black;
+            vlcContainer.BackColor = Color.Transparent;
+            vlcContainer.Controls.Add(dancingGirlPictureBox);
             vlcContainer.Controls.Add(panelPlaylist);
             vlcContainer.Controls.Add(sparkleVisualizer1);
             vlcContainer.Dock = DockStyle.Fill;
             vlcContainer.Location = new Point(0, 0);
             vlcContainer.Margin = new Padding(3, 4, 3, 4);
             vlcContainer.Name = "vlcContainer";
-            vlcContainer.Size = new Size(896, 427);
+            vlcContainer.Size = new Size(982, 427);
             vlcContainer.TabIndex = 5;
+            // 
+            // dancingGirlPictureBox
+            // 
+            dancingGirlPictureBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            dancingGirlPictureBox.BackColor = Color.Transparent;
+            dancingGirlPictureBox.Location = new Point(0, 356);
+            dancingGirlPictureBox.Name = "dancingGirlPictureBox";
+            dancingGirlPictureBox.Size = new Size(62, 71);
+            dancingGirlPictureBox.SizeMode = PictureBoxSizeMode.Zoom;
+            dancingGirlPictureBox.TabIndex = 12;
+            dancingGirlPictureBox.TabStop = false;
+            dancingGirlPictureBox.Visible = false;
             // 
             // panelPlaylist
             // 
             panelPlaylist.BackColor = Color.FromArgb(255, 192, 192);
             panelPlaylist.Controls.Add(tabControl1);
             panelPlaylist.Dock = DockStyle.Right;
-            panelPlaylist.Location = new Point(610, 0);
+            panelPlaylist.Location = new Point(696, 0);
             panelPlaylist.Margin = new Padding(3, 4, 3, 4);
             panelPlaylist.Name = "panelPlaylist";
             panelPlaylist.Size = new Size(286, 427);
@@ -240,7 +258,6 @@
             // 
             listPlaylist.BackColor = Color.FromArgb(254, 184, 195);
             listPlaylist.ContextMenuStrip = menuPlaylist;
-            listPlaylist.Dock = DockStyle.Top;
             listPlaylist.FormattingEnabled = true;
             listPlaylist.ItemHeight = 19;
             listPlaylist.Location = new Point(3, 4);
@@ -344,7 +361,7 @@
             sparkleVisualizer1.Location = new Point(0, 0);
             sparkleVisualizer1.Margin = new Padding(8, 13, 8, 13);
             sparkleVisualizer1.Name = "sparkleVisualizer1";
-            sparkleVisualizer1.Size = new Size(896, 427);
+            sparkleVisualizer1.Size = new Size(982, 427);
             sparkleVisualizer1.TabIndex = 0;
             sparkleVisualizer1.UseIdleWallpaper = true;
             // 
@@ -368,18 +385,19 @@
             controlPanel.Location = new Point(0, 427);
             controlPanel.Margin = new Padding(3, 4, 3, 4);
             controlPanel.Name = "controlPanel";
-            controlPanel.Size = new Size(896, 134);
+            controlPanel.Size = new Size(982, 134);
             controlPanel.TabIndex = 4;
             // 
             // btnAddCurrentToPlaylist
             // 
+            btnAddCurrentToPlaylist.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnAddCurrentToPlaylist.BackColor = Color.Transparent;
             btnAddCurrentToPlaylist.BackgroundImage = Properties.Resources.AddToPlaylistIcon;
             btnAddCurrentToPlaylist.BackgroundImageLayout = ImageLayout.Zoom;
             btnAddCurrentToPlaylist.Cursor = Cursors.Hand;
             btnAddCurrentToPlaylist.FlatAppearance.BorderSize = 0;
             btnAddCurrentToPlaylist.FlatStyle = FlatStyle.Flat;
-            btnAddCurrentToPlaylist.Location = new Point(554, 62);
+            btnAddCurrentToPlaylist.Location = new Point(640, 62);
             btnAddCurrentToPlaylist.Margin = new Padding(3, 4, 3, 4);
             btnAddCurrentToPlaylist.Name = "btnAddCurrentToPlaylist";
             btnAddCurrentToPlaylist.Size = new Size(50, 54);
@@ -397,7 +415,7 @@
             shuffle.Cursor = Cursors.Hand;
             shuffle.FlatAppearance.BorderSize = 0;
             shuffle.FlatStyle = FlatStyle.Flat;
-            shuffle.Location = new Point(828, 70);
+            shuffle.Location = new Point(914, 70);
             shuffle.Margin = new Padding(3, 4, 3, 4);
             shuffle.Name = "shuffle";
             shuffle.Size = new Size(50, 51);
@@ -408,13 +426,14 @@
             // 
             // openPlaylist
             // 
+            openPlaylist.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             openPlaylist.BackColor = Color.Transparent;
             openPlaylist.BackgroundImage = Properties.Resources.PlaylistIcon;
             openPlaylist.BackgroundImageLayout = ImageLayout.Zoom;
             openPlaylist.Cursor = Cursors.Hand;
             openPlaylist.FlatAppearance.BorderSize = 0;
             openPlaylist.FlatStyle = FlatStyle.Flat;
-            openPlaylist.Location = new Point(610, 61);
+            openPlaylist.Location = new Point(696, 61);
             openPlaylist.Margin = new Padding(3, 4, 3, 4);
             openPlaylist.Name = "openPlaylist";
             openPlaylist.Size = new Size(62, 57);
@@ -432,7 +451,7 @@
             loopBtn.Cursor = Cursors.Hand;
             loopBtn.FlatAppearance.BorderSize = 0;
             loopBtn.FlatStyle = FlatStyle.Flat;
-            loopBtn.Location = new Point(682, 57);
+            loopBtn.Location = new Point(768, 57);
             loopBtn.Margin = new Padding(3, 4, 3, 4);
             loopBtn.Name = "loopBtn";
             loopBtn.Size = new Size(64, 65);
@@ -476,7 +495,7 @@
             seekBar.Maximum = 1000;
             seekBar.Name = "seekBar";
             seekBar.ProgressColor = Color.DeepPink;
-            seekBar.Size = new Size(671, 45);
+            seekBar.Size = new Size(757, 45);
             seekBar.TabIndex = 4;
             seekBar.Thumb = CustomTrackBar.ThumbShape.Circle;
             seekBar.ThumbColor = Color.HotPink;
@@ -579,7 +598,7 @@
             btnChangeTheme.Cursor = Cursors.Hand;
             btnChangeTheme.FlatAppearance.BorderSize = 0;
             btnChangeTheme.FlatStyle = FlatStyle.Flat;
-            btnChangeTheme.Location = new Point(753, 59);
+            btnChangeTheme.Location = new Point(839, 59);
             btnChangeTheme.Margin = new Padding(3, 4, 3, 4);
             btnChangeTheme.Name = "btnChangeTheme";
             btnChangeTheme.Size = new Size(69, 69);
@@ -611,8 +630,8 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 16F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.FromArgb(255, 240, 250);
-            ClientSize = new Size(896, 588);
+            BackColor = Color.Black;
+            ClientSize = new Size(982, 588);
             Controls.Add(videoPanel);
             Controls.Add(menuStrip1);
             Font = new Font("MS Gothic", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -629,6 +648,7 @@
             menuStrip1.PerformLayout();
             videoPanel.ResumeLayout(false);
             vlcContainer.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dancingGirlPictureBox).EndInit();
             panelPlaylist.ResumeLayout(false);
             tabControl1.ResumeLayout(false);
             tabCurrent.ResumeLayout(false);
@@ -688,5 +708,6 @@
         private ToolTip PlaylistTooltip;
         private ToolTip AddToPlaylistTooltip;
         private ToolTip ShufflePlaylistTooltip;
+        private PictureBox dancingGirlPictureBox;
     }
 }

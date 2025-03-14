@@ -97,6 +97,17 @@ namespace CuteMediaPlayer
                                     seekBar.Value = 0;
                                     btnPlayPause.BackgroundImage = Properties.Resources.PlayIcon;
 
+                                    // switch the position of dancing girl
+                                    if (random.Next(3) == 2)
+                                    {
+                                        dancingGirlPictureBox.Location = new Point(630, 356);
+                                        dancingGirlPictureBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+                                    }else
+                                    {
+                                        dancingGirlPictureBox.Location = new Point(0, 356);
+                                        dancingGirlPictureBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+                                    }
+
                                     // Show idle visualizer
                                     UpdateVisualizerVisibility();
                                 }
@@ -128,9 +139,11 @@ namespace CuteMediaPlayer
                             if (isAudioFile)
                             {
                                 sparkleVisualizer1.Visible = true;
+                                dancingGirlPictureBox.Visible = true;
                                 sparkleVisualizer1.IsIdleMode = false;
                                 sparkleVisualizer1.BringToFront();
                                 sparkleVisualizer1.RefreshVisuals();
+                                dancingGirlPictureBox.BringToFront();
                             }
                         }));
                     }
@@ -152,8 +165,10 @@ namespace CuteMediaPlayer
                             {
                                 sparkleVisualizer1.Visible = true;
                                 sparkleVisualizer1.IsIdleMode = true;
+                                dancingGirlPictureBox.Visible = false;
                                 sparkleVisualizer1.BringToFront();
                                 sparkleVisualizer1.RefreshVisuals();
+
                             }
                         }));
                     }

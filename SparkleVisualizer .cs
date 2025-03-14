@@ -41,6 +41,10 @@ namespace CuteMediaPlayer
             InitializeComponent();
             this.DoubleBuffered = true;
 
+            // Allow transparent background
+            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+            this.BackColor = Color.Transparent;
+
             // Add color schemes
             colorSchemes.Add(new ColorScheme(Color.HotPink, Color.DeepSkyBlue, Color.Gold)); // Default
             colorSchemes.Add(new ColorScheme(Color.Purple, Color.Violet, Color.LightPink)); // Purple theme
@@ -59,12 +63,12 @@ namespace CuteMediaPlayer
             animationTimer.Start();
         }
 
-
-        public void SetIdleWallpaper(Image wallpaper)
-        {
-            idleWallpaper = wallpaper;
-            Invalidate(); // Redraw with new wallpaper
-        }
+        // i disabled this for now
+        //public void SetIdleWallpaper(Image wallpaper)
+        //{
+        //    idleWallpaper = wallpaper;
+        //    Invalidate(); // Redraw with new wallpaper
+        //}
 
 
 
@@ -82,11 +86,11 @@ namespace CuteMediaPlayer
                     // Draw the wallpaper to fill the control
                     e.Graphics.DrawImage(idleWallpaper, ClientRectangle);
                 }
-                else
-                {
-                    // Original background drawing code (usually clear with black)
-                    e.Graphics.Clear(Color.Black);
-                }
+                //else
+                //{
+                //    // Original background drawing code (black)
+                //    e.Graphics.Clear(Color.Black);
+                //}
 
                 // Draw a rotating pink star
                 using (var starBrush = new SolidBrush(Color.FromArgb(0xFE, 0xB8, 0xC3))) //this color #feb8c3

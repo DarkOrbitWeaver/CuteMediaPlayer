@@ -9,7 +9,7 @@ namespace CuteMediaPlayer
     {
 
         private Random random = new Random();
-   
+
         // loop
         private bool loopEnabled = false;
         // 
@@ -19,6 +19,14 @@ namespace CuteMediaPlayer
         string FilesFilter = "Media Files|*.mp4;*.mp3;*.avi;*.mkv;*.wav;*.m4a;*.aac;*.flac;*.ogg;*.wma";
 
         private Timer uiTimer;
+
+        // dancing girl
+        private Timer dancingGirlTimer;
+        private List<Image>[] danceFrames = [new List<Image>(), new List<Image>(), new List<Image>(), new List<Image>()];
+        private int currentFrame = 0;
+        private int currentFrameSet = 0;
+        private bool switchFrameSet = false;
+        private int lastSwitch = 0; // to prevent fast switch between frameset
 
         public Form1()
         {
@@ -39,6 +47,8 @@ namespace CuteMediaPlayer
             SetupButtonAppearance(openPlaylist);
             SetupButtonAppearance(btnAddCurrentToPlaylist);
 
+            // dancing girl
+            InitializeDancingGirl();
 
 
             // 🕒 Timer to update UI elements (seek bar/time label)
@@ -80,9 +90,15 @@ namespace CuteMediaPlayer
 
             uiTimer.Start();
 
+            // dancing girl timer
+            //dancingGirlTimer = new Timer();
+            //dancingGirlTimer.Interval = 80;
+            //dancingGirlTimer.Tick += DancingGirlTimer_Tick;
+            //dancingGirlTimer.Start();
+
         }
 
-       
+
         // mute 
         private bool isMuted = false;
         private void btnMute_Click(object sender, EventArgs e)
@@ -209,15 +225,15 @@ namespace CuteMediaPlayer
             {
                 bool mediaLoaded = currentTrackIndex >= 0 && playlist.Count > 0;
                 btnPlayPause.Enabled = mediaLoaded;
-                UpdateButtonImages(); 
+                UpdateButtonImages();
                 btnStop.Enabled = mediaLoaded;
-                UpdateButtonImages(); 
+                UpdateButtonImages();
                 btnNext.Enabled = mediaLoaded && playlist.Count > 1;
-                UpdateButtonImages(); 
+                UpdateButtonImages();
                 btnPrev.Enabled = mediaLoaded && playlist.Count > 1;
-                UpdateButtonImages(); 
+                UpdateButtonImages();
                 seekBar.Enabled = mediaLoaded;
-                UpdateButtonImages(); 
+                UpdateButtonImages();
                 btnChangeTheme.Enabled = isAudioFile;
                 UpdateButtonImages();
             }
@@ -227,7 +243,7 @@ namespace CuteMediaPlayer
                 Console.WriteLine($"Error setting options: {ex.Message}");
             }
         }
- 
+
         private void UpdateWindowTitle()
         {
             // Default title when no media is playing
@@ -316,6 +332,100 @@ namespace CuteMediaPlayer
             Properties.Settings.Default.Save();
         }
 
-   
+        private void DisposeOfDancingGirlFrames()
+        {
+            // Stop and dispose timer
+            if (dancingGirlTimer != null)
+            {
+                dancingGirlTimer.Stop();
+                dancingGirlTimer.Dispose();
+            }
+
+            // Clean up image resources
+            foreach (var frame in danceFrames[currentFrameSet])
+            {
+                if (frame != null)
+                    frame.Dispose();
+            }
+            danceFrames[currentFrameSet].Clear();
+        }
+
+        // Load images from folder with transparency support
+        // set timers and the loader to get the frames
+        private void InitializeDancingGirl()
+        {
+            // Set the picture box to have transparent background
+            dancingGirlPictureBox.BackColor = Color.Transparent;
+
+            // Load images from folder
+            string[] animationAssetsPath = ["hips", "snap", "slide", "balancing"];
+
+            for (int i = 0; i < animationAssetsPath.Length; i++)
+            {
+                string tempPath = Path.Combine(Application.StartupPath, "Assets", "DancingGirlFiles", animationAssetsPath[i]);
+                animationAssetsPath[i] = tempPath;
+            }
+
+            for (int i = 0; i < animationAssetsPath.Length; i++)
+            {
+                // Get all PNG files
+                string[] frameFiles = Directory.GetFiles(animationAssetsPath[i], "*.png");
+
+                // Load them in order
+                for (int j = 0; j < frameFiles.Length; j++)
+                {
+                    // Create a bitmap and make black pixels transparent
+                    Bitmap bmp = new Bitmap(frameFiles[j]);
+                    bmp.MakeTransparent(Color.Black); // This makes black backgrounds transparent
+
+                    danceFrames[i].Add(bmp);
+                }
+
+            }
+
+       
+
+
+
+
+            // Set up timer for animation
+            dancingGirlTimer = new Timer();
+            dancingGirlTimer.Interval = 100; // Adjust speed as needed (milliseconds)
+            dancingGirlTimer.Tick += DancingGirlTimer_Tick;
+            dancingGirlTimer.Start();
+        }
+        // animate girl 
+        private void DancingGirlTimer_Tick(object sender, EventArgs e)
+        {
+            // if loaded frames successfully
+            if (danceFrames[currentFrameSet].Count > 0)
+            {
+                // if not reached the end of the frames
+                if (currentFrame < danceFrames[currentFrameSet].Count)
+                {
+
+                    dancingGirlPictureBox.Image = danceFrames[currentFrameSet][currentFrame];
+                    currentFrame++;
+                    dancingGirlTimer.Interval = 100;
+                }
+                else
+                {
+                    // change dancing set if allowed
+                    if (lastSwitch >= 100)
+                    {
+                        currentFrameSet = random.Next(danceFrames.Count());
+                        switchFrameSet = false;
+                        lastSwitch = 0;
+                    }
+
+                    // if reached the end restart the animation
+                    currentFrame = 0;
+                    dancingGirlTimer.Interval = 10;
+                }
+                //
+                lastSwitch++;
+            }
+        }
+
     }
 }
