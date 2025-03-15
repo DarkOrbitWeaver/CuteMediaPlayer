@@ -72,18 +72,25 @@ namespace CuteMediaPlayer
         private void LoadAllPlaylists()
         {
             allPlaylists.Clear();
-
-            // Create directory if it doesn't exist
             Directory.CreateDirectory(playlistsFolder);
 
             foreach (var file in Directory.GetFiles(playlistsFolder, "*.m3u"))
             {
-                var pl = new Playlist
+                try
                 {
-                    Name = Path.GetFileNameWithoutExtension(file),
-                    Tracks = File.ReadAllLines(file).Where(File.Exists).ToList()
-                };
-                allPlaylists.Add(pl);
+                    var pl = new Playlist
+                    {
+                        Name = Path.GetFileNameWithoutExtension(file),
+                        Tracks = File.ReadAllLines(file)
+                                      .Where(line => File.Exists(line))
+                                      .ToList()
+                    };
+                    allPlaylists.Add(pl);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error loading playlist '{file}': {ex.Message}");
+                }
             }
 
             listSavedPlaylists.Items.AddRange(allPlaylists.Select(p => p.Name).ToArray());
@@ -91,47 +98,119 @@ namespace CuteMediaPlayer
 
         private void NewPlaylist_Click(object sender, EventArgs e)
         {
-            // 🎀 Use our cute dialog instead of default InputBox
-            using (var nameDialog = new NewPlaylistDialog())
+            string baseName = "";
+            string finalName = "";
+            bool isValidName = false;
+
+            // Keep asking for a name until valid or user cancels
+            while (!isValidName)
             {
-                if (nameDialog.ShowDialog() != DialogResult.OK) return;
-
-                string name = nameDialog.PlaylistName.Trim();
-                if (string.IsNullOrWhiteSpace(name)) return;
-
-                // Create empty playlist 
-                var newPl = new Playlist { Name = name };
-                allPlaylists.Add(newPl);
-                listSavedPlaylists.Items.Add(name);
-
-                // ❓ Ask to add files (we'll keep MessageBox for now)
-                DialogResult result = MessageBox.Show("Add files to this playlist now?", "Add Files", MessageBoxButtons.YesNo);
-
-                if (result == DialogResult.Yes)
+                using (var nameDialog = new NewPlaylistDialog())
                 {
-                    using OpenFileDialog fileDialog = new OpenFileDialog();
-                    fileDialog.Title = "Select Media Files 🎧"; // Add cute emoji
-                    fileDialog.Multiselect = true;
-                    fileDialog.Filter = FilesFilter;
+                    // Pre-fill the dialog with last generated name
+                    nameDialog.PlaylistName = finalName;
 
-                    if (fileDialog.ShowDialog() == DialogResult.OK)
+                    // User clicked Cancel
+                    if (nameDialog.ShowDialog() != DialogResult.OK) return;
+
+                    baseName = nameDialog.PlaylistName.Trim();
+
+                    // Empty name check
+                    if (string.IsNullOrWhiteSpace(baseName))
                     {
-                        //  Add files (no duplicates) 
-                        foreach (string file in fileDialog.FileNames)
+                        MessageBox.Show("Playlist name cannot be empty!");
+                        continue;
+                    }
+
+                    // Check for duplicates
+                    finalName = baseName;
+                    int counter = 1;
+                    bool nameExists;
+
+                    do
+                    {
+                        nameExists = false;
+                        // Simple loop instead of LINQ
+                        foreach (Playlist p in allPlaylists)
                         {
-                            if (!newPl.Tracks.Contains(file))
+                            if (string.Equals(p.Name, finalName, StringComparison.OrdinalIgnoreCase))
                             {
-                                newPl.Tracks.Add(file);
+                                nameExists = true;
+                                finalName = $"{baseName}_{counter}";
+                                counter++;
+                                break;
                             }
                         }
+                    } while (nameExists);
+
+                    // If name was changed
+                    if (finalName != baseName)
+                    {
+                        DialogResult choice = MessageBox.Show(
+                            $"Name taken! Use '{finalName}' instead?",
+                            "Oops!",
+                            MessageBoxButtons.YesNoCancel);
+
+                        if (choice == DialogResult.Yes) isValidName = true;
+                        else if (choice == DialogResult.Cancel) return;
+                        // Else (No) - loop again
+                    }
+                    else
+                    {
+                        isValidName = true;
                     }
                 }
+            }
 
-                // 💾 Save changes 
-                SaveAllPlaylists();
+            // Create new playlist
+            var newPl = new Playlist { Name = finalName };
+            allPlaylists.Add(newPl);
+            listSavedPlaylists.Items.Add(finalName);
+
+            // Ask to add files
+            DialogResult addFiles = MessageBox.Show(
+                "Add files to this playlist now?",
+                "Add Files",
+                MessageBoxButtons.YesNo);
+
+            if (addFiles == DialogResult.Yes)
+            {
+                using OpenFileDialog fileDialog = new OpenFileDialog()
+                {
+                    Title = "Select Media Files 🎧",
+                    Multiselect = true,
+                    Filter = FilesFilter
+                };
+
+                if (fileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    // Add files with simple duplicate check
+                    foreach (string file in fileDialog.FileNames)
+                    {
+                        bool duplicateFound = false;
+                        foreach (string track in newPl.Tracks)
+                        {
+                            if (string.Equals(track, file, StringComparison.OrdinalIgnoreCase))
+                            {
+                                duplicateFound = true;
+                                break;
+                            }
+                        }
+
+                        if (!duplicateFound) newPl.Tracks.Add(file);
+                    }
+
+                    // Save only if files added
+                    if (newPl.Tracks.Count > 0) SaveAllPlaylists();
+                }
+                else
+                {
+                    // Remove empty playlist if user cancels file selection
+                    allPlaylists.Remove(newPl);
+                    listSavedPlaylists.Items.Remove(finalName);
+                }
             }
         }
-
 
         // this plays the selected track
         private void listPlaylist_DoubleClick(object sender, EventArgs e)
@@ -209,15 +288,25 @@ namespace CuteMediaPlayer
 
             if (result == DialogResult.Yes)
             {
-                var pl = allPlaylists[listSavedPlaylists.SelectedIndex];
+ 
+                try
+                {
+                    var pl = allPlaylists[listSavedPlaylists.SelectedIndex];
 
-                // Delete file
-                File.Delete(Path.Combine(playlistsFolder, $"{pl.Name}.m3u"));
+                    // Delete file
+                    File.Delete(Path.Combine(playlistsFolder, $"{pl.Name}.m3u"));
 
-                // Update UI
-                allPlaylists.RemoveAt(listSavedPlaylists.SelectedIndex);
-                listSavedPlaylists.Items.RemoveAt(listSavedPlaylists.SelectedIndex);
-                SaveAllPlaylists();
+                    // Update UI
+                    allPlaylists.RemoveAt(listSavedPlaylists.SelectedIndex);
+                    listSavedPlaylists.Items.RemoveAt(listSavedPlaylists.SelectedIndex);
+                    SaveAllPlaylists();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error deleting playlist: {ex.Message}");
+                    return;
+                }
+
             }
         }
 
@@ -325,6 +414,7 @@ namespace CuteMediaPlayer
             // Check for existing
             if (!target.Tracks.Contains(selectedFile))
             {
+                // Add to existing tracks (this is the fix - we're adding to the existing list)
                 target.Tracks.Add(selectedFile);
                 SaveAllPlaylists();
                 MessageBox.Show("Added to playlist!");
@@ -334,6 +424,7 @@ namespace CuteMediaPlayer
                 MessageBox.Show("Song already exists in this playlist!");
             }
         }
+
         // adding songs to a playlist
         private void btnAddToPlaylist_Click(object sender, EventArgs e)
         {
@@ -364,23 +455,24 @@ namespace CuteMediaPlayer
 
         private void btnAddCurrentToPlaylist_Click(object sender, EventArgs e)
         {
-            //  Check if any track is playing
+            // Check if any track is playing
             if (currentTrackIndex == -1 || playlist.Count == 0)
             {
                 MessageBox.Show("No track is playing!");
                 return;
             }
 
-            //  Get current track
+            // Get current track
             string currentFile = playlist[currentTrackIndex];
 
-            //  Select target playlist
+            // Select target playlist
             Playlist target = SelectPlaylistDialog();
             if (target == null) return;
 
-            //  Check if already exists
+            // Check if already exists
             if (!target.Tracks.Contains(currentFile))
             {
+                // Add to existing tracks (this is the fix - we're adding to the existing list)
                 target.Tracks.Add(currentFile);
                 SaveAllPlaylists();
                 MessageBox.Show("Added current song to playlist!");
@@ -390,7 +482,6 @@ namespace CuteMediaPlayer
                 MessageBox.Show("Song already exists in this playlist!");
             }
         }
-
 
     }
 }

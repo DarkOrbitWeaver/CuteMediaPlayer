@@ -2,7 +2,12 @@
 {
     partial class NewPlaylistDialog : Form
     {
-        public string PlaylistName => txtInput.Text;
+        // Allow setting the textbox value
+        public string PlaylistName
+        {
+            get => txtInput.Text;
+            set => txtInput.Text = value; // New setter!
+        }
 
         public NewPlaylistDialog()
         {
@@ -19,3 +24,4 @@
         }
     }
 }
+

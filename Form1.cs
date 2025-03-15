@@ -157,42 +157,35 @@ namespace CuteMediaPlayer
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                // 🗑️ Clear existing playlist and add new files
-                currentPlaylist.Tracks.Clear();
+                // Get valid files
                 var validFiles = dialog.FileNames.Where(f => File.Exists(f)).ToArray();
-                currentPlaylist.Tracks.AddRange(validFiles);
 
-                // 🔄 Sync playlist reference (if still needed elsewhere)
+                // 🎵 Create NEW temporary playlist
+                currentPlaylist = new Playlist { Name = $"Temporary_{DateTime.Now:yyyyMMdd_HHmmss}" };
+                foreach (string file in validFiles)
+                {
+                    currentPlaylist.Tracks.Add(file);
+                }
+
+                // 🔄 Sync playlist reference
                 playlist = currentPlaylist.Tracks;
+                currentTrackIndex = 0; // ALWAYS reset to first track ⭐
 
-                // 🎵 Initialize playback
-                currentTrackIndex = 0;
-                UpdateFileType(); // Detect audio/video type
-                UpdateWindowTitle(); // Update title bar
+                // ⭐ STOP OLD PLAYBACK + START NEW
+                if (mediaPlayer.IsPlaying) mediaPlayer.Stop();
+                PlayCurrentTrack(); // ⭐ THIS IS THE KEY FIX
+
+                UpdateFileType();
+                UpdateWindowTitle();
 
                 // 📋 Update playlist UI
                 listPlaylist.Items.Clear();
-                listPlaylist.Items.AddRange(validFiles.Select(Path.GetFileName).ToArray());
+                listPlaylist.Items.AddRange(currentPlaylist.Tracks.Select(Path.GetFileName).ToArray());
 
-                // 💾 Save to disk
-                SaveAllPlaylists();
-
-                // ▶️ Start playback if files were loaded
-                if (currentPlaylist.Tracks.Count > 0)
-                {
-                    mediaPlayer.Play(new FileInfo(currentPlaylist.Tracks[currentTrackIndex]));
-                    btnPlayPause.BackgroundImage = Properties.Resources.PauseIcon;
-
-                    // 🔊 Reset audio settings
-                    mediaPlayer.Audio.Volume = volumeBar.Value;
-                    isMuted = false;
-                    btnMute.BackgroundImage = Properties.Resources.MuteIcon;
-                }
+                // 🔄 Update buttons
+                UpdateButtonStates();
+                UpdateButtonImages();
             }
-
-            // 🔄 Update button states (play/stop etc.)
-            UpdateButtonStates();
-            UpdateButtonImages();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -343,9 +336,16 @@ namespace CuteMediaPlayer
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            SaveAllPlaylists();
-            Properties.Settings.Default.LastVolume = volumeBar.Value;
-            Properties.Settings.Default.Save();
+            try
+            {
+                SaveAllPlaylists(); // Only saves playlists in allPlaylists
+                Properties.Settings.Default.LastVolume = volumeBar.Value;
+                Properties.Settings.Default.Save();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving settings: {ex.Message}");
+            }
         }
 
         private void DisposeOfDancingGirlFrames()
