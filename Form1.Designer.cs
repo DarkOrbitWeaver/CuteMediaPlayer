@@ -104,6 +104,7 @@
             PlaylistTooltip = new ToolTip(components);
             AddToPlaylistTooltip = new ToolTip(components);
             ShufflePlaylistTooltip = new ToolTip(components);
+            openMinimizedPlayer = new Button();
             menuStrip1.SuspendLayout();
             videoPanel.SuspendLayout();
             vlcContainer.SuspendLayout();
@@ -230,6 +231,7 @@
             // tabCurrent
             // 
             tabCurrent.BackColor = Color.FromArgb(254, 184, 195);
+            tabCurrent.Controls.Add(openMinimizedPlayer);
             tabCurrent.Controls.Add(btnAddToPlaylist);
             tabCurrent.Controls.Add(listPlaylist);
             tabCurrent.Location = new Point(4, 28);
@@ -626,6 +628,20 @@
             MuteBtnToolTip.InitialDelay = 800;
             MuteBtnToolTip.ReshowDelay = 100;
             // 
+            // openMinimizedPlayer
+            // 
+            openMinimizedPlayer.BackColor = Color.FromArgb(255, 192, 192);
+            openMinimizedPlayer.Cursor = Cursors.Hand;
+            openMinimizedPlayer.Font = new Font("MS PGothic", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            openMinimizedPlayer.Location = new Point(139, 354);
+            openMinimizedPlayer.Margin = new Padding(3, 4, 3, 4);
+            openMinimizedPlayer.Name = "openMinimizedPlayer";
+            openMinimizedPlayer.Size = new Size(126, 36);
+            openMinimizedPlayer.TabIndex = 2;
+            openMinimizedPlayer.Text = "Minimzed";
+            openMinimizedPlayer.UseVisualStyleBackColor = false;
+            openMinimizedPlayer.Click += openMinimizedPlayer_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 16F);
@@ -638,7 +654,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
             Margin = new Padding(3, 4, 3, 4);
-            MinimumSize = new Size(912, 627);
+            MinimumSize = new Size(998, 627);
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "✨ Cute Media Player ✨";
@@ -709,5 +725,6 @@
         private ToolTip AddToPlaylistTooltip;
         private ToolTip ShufflePlaylistTooltip;
         private PictureBox dancingGirlPictureBox;
+        private Button openMinimizedPlayer;
     }
 }

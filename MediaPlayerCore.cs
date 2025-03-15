@@ -267,7 +267,7 @@ namespace CuteMediaPlayer
 
         }
 
-        private void btnPlayPause_Click(object sender, EventArgs e)
+        public void btnPlayPause_Click(object sender, EventArgs e)
         {
             try
             {
@@ -318,7 +318,7 @@ namespace CuteMediaPlayer
             UpdateButtonImages();
         }
 
-        private void btnStop_Click(object sender, EventArgs e)
+        public void btnStop_Click(object sender, EventArgs e)
         {
             try
             {
@@ -347,7 +347,7 @@ namespace CuteMediaPlayer
             UpdateButtonImages();
         }
 
-        private void btnNext_Click(object sender, EventArgs e)
+        public void btnNext_Click(object sender, EventArgs e)
         {
             if (playlist.Count == 0) return;
             currentTrackIndex = (currentTrackIndex + 1) % playlist.Count;
@@ -361,7 +361,7 @@ namespace CuteMediaPlayer
             UpdateButtonImages();
         }
 
-        private void btnPrev_Click(object sender, EventArgs e)
+        public void btnPrev_Click(object sender, EventArgs e)
         {
             if (playlist.Count == 0) return;
             currentTrackIndex = (currentTrackIndex - 1 + playlist.Count) % playlist.Count;

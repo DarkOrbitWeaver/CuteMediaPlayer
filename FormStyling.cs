@@ -18,7 +18,7 @@ namespace CuteMediaPlayer
 
             // Setup form
             form.FormBorderStyle = FormBorderStyle.None;
-            form.BackColor = Color.FromArgb(255, 240, 250); // Your standard pink background
+            form.BackColor = Color.FromArgb(254, 184, 195); // Your standard pink background
 
             // Enable double buffering for smooth painting
             typeof(Control).GetProperty("DoubleBuffered",

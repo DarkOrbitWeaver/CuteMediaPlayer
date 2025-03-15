@@ -78,7 +78,7 @@ namespace CuteMediaPlayer
         }
 
         // New helper method to update button background images based on enabled state
-        private void UpdateButtonImages()
+        public void UpdateButtonImages()
         {
             // Play/Pause button
             if (!btnPlayPause.Enabled)
@@ -111,13 +111,14 @@ namespace CuteMediaPlayer
                 ? Properties.Resources.NextIcon
                 : Properties.Resources.DisabledNextIcon;
 
-            // Theme button - if it has disabled state
-            if (Properties.Resources.ResourceManager.GetObject("DisabledThemeIcon") != null)
-            {
-                btnChangeTheme.BackgroundImage = btnChangeTheme.Enabled
-                    ? Properties.Resources.ThemeIcon
-                    : (Image)Properties.Resources.ResourceManager.GetObject("DisabledThemeIcon");
-            }
+            // Theme button
+
+            btnChangeTheme.BackgroundImage = btnChangeTheme.Enabled
+                ? Properties.Resources.ThemeIcon
+                : Properties.Resources.DisabledThemeIcon;
+
+            // Notify listeners that button states changed
+            OnButtonStatesChanged();
 
         }
 

@@ -28,6 +28,20 @@ namespace CuteMediaPlayer
         private bool switchFrameSet = false;
         private int lastSwitch = 0; // to prevent fast switch between frameset
 
+        // for the minimzed player 
+        // Public properties to access button states
+        public bool IsPlayPauseEnabled => btnPlayPause.Enabled;
+        public bool IsNextEnabled => btnNext.Enabled;
+        public bool IsPrevEnabled => btnPrev.Enabled;
+
+        // Public properties to access button images
+        public Image PlayPauseImage => btnPlayPause.BackgroundImage;
+        public Image NextImage => btnNext.BackgroundImage;
+        public Image PrevImage => btnPrev.BackgroundImage;
+
+        // Event that fires when button states change
+        public event EventHandler ButtonStatesChanged;
+
         public Form1()
         {
             InitializeComponent();
@@ -49,7 +63,6 @@ namespace CuteMediaPlayer
 
             // dancing girl
             InitializeDancingGirl();
-
 
             // 🕒 Timer to update UI elements (seek bar/time label)
             uiTimer = new Timer { Interval = 250 }; // Smoother updates at 250ms
@@ -219,7 +232,7 @@ namespace CuteMediaPlayer
             }
         }
 
-        private void UpdateButtonStates()
+        public void UpdateButtonStates()
         {
             try
             {
@@ -236,6 +249,9 @@ namespace CuteMediaPlayer
                 UpdateButtonImages();
                 btnChangeTheme.Enabled = isAudioFile;
                 UpdateButtonImages();
+
+                // Notify listeners that button states changed
+                OnButtonStatesChanged();
             }
             catch (Exception ex)
             {
@@ -350,7 +366,7 @@ namespace CuteMediaPlayer
             danceFrames[currentFrameSet].Clear();
         }
 
-        // Load images from folder with transparency support
+        // Load images from folder with transparency support (winform doesnt support it i think?)
         // set timers and the loader to get the frames
         private void InitializeDancingGirl()
         {
@@ -383,7 +399,7 @@ namespace CuteMediaPlayer
 
             }
 
-       
+
 
 
 
@@ -426,6 +442,33 @@ namespace CuteMediaPlayer
                 lastSwitch++;
             }
         }
+        // to open minimized player
+        private void openMinimizedPlayer_Click(object sender, EventArgs e)
+        {
+            // Create the minimized player
+            MinimizedPlayer minimizedPlayer = new MinimizedPlayer(this);
 
+            // Minimize the main form
+            this.WindowState = FormWindowState.Minimized;
+
+            // Make sure the minimized player appears properly
+            minimizedPlayer.WindowState = FormWindowState.Normal;
+            minimizedPlayer.StartPosition = FormStartPosition.CenterScreen;
+            minimizedPlayer.Show();
+            minimizedPlayer.Activate(); // Force focus to the new form
+            minimizedPlayer.BringToFront(); // Make sure it's visible on top
+
+            // When minimized player closes, restore the main form
+            minimizedPlayer.FormClosed += (s, args) => {
+                this.WindowState = FormWindowState.Normal;
+                this.Activate(); // Bring the main form to the front
+            };
+        }
+
+        //  whenever your button states change
+        protected void OnButtonStatesChanged()
+        {
+            ButtonStatesChanged?.Invoke(this, EventArgs.Empty);
+        }
     }
 }
