@@ -64,6 +64,11 @@ namespace CuteMediaPlayer
             // dancing girl
             InitializeDancingGirl();
 
+            // new playlist ui
+            InitializeCustomPlaylistControls();
+
+
+
             // 🕒 Timer to update UI elements (seek bar/time label)
             uiTimer = new Timer { Interval = 250 }; // Smoother updates at 250ms
 
@@ -151,6 +156,11 @@ namespace CuteMediaPlayer
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            OpenToolStripMenuItemHelper();
+        }
+
+        private void OpenToolStripMenuItemHelper()
+        {
             using OpenFileDialog dialog = new OpenFileDialog();
             dialog.Filter = FilesFilter;
             dialog.Multiselect = true;
@@ -179,8 +189,8 @@ namespace CuteMediaPlayer
                 UpdateWindowTitle();
 
                 // 📋 Update playlist UI
-                listPlaylist.Items.Clear();
-                listPlaylist.Items.AddRange(currentPlaylist.Tracks.Select(Path.GetFileName).ToArray());
+                customPlaylistPanel.ClearTracks();
+                currentPlaylist.Tracks.ForEach(t => customPlaylistPanel.AddTrack(t));
 
                 // 🔄 Update buttons
                 UpdateButtonStates();
@@ -280,19 +290,21 @@ namespace CuteMediaPlayer
 
         private void CleanInvalidPaths()
         {
-
             Directory.CreateDirectory(playlistsFolder);
 
-            // Remove missing files from current playlist
+            // Track original count before cleanup
+            int originalCount = currentPlaylist.Tracks.Count;
+
+            // Remove missing files
             currentPlaylist.Tracks = currentPlaylist.Tracks
                 .Where(File.Exists)
                 .ToList();
 
-            listPlaylist.Items.Clear();
-            listPlaylist.Items.AddRange(currentPlaylist.Tracks.Select(Path.GetFileName).ToArray());
+            // ✅ Update custom UI
+            customPlaylistPanel.SetTracks(currentPlaylist.Tracks);
 
-            // Show warning if many files missing
-            if (currentPlaylist.Tracks.Count < listPlaylist.Items.Count)
+            // ✅ Check against original count
+            if (currentPlaylist.Tracks.Count < originalCount)
             {
                 MessageBox.Show("Some files could not be found and were removed");
             }

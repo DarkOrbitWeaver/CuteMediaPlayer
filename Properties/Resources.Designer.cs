@@ -183,6 +183,16 @@ namespace CuteMediaPlayer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap MusicPlaceholderIcon {
+            get {
+                object obj = ResourceManager.GetObject("MusicPlaceholderIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap MuteIcon {
             get {
                 object obj = ResourceManager.GetObject("MuteIcon", resourceCulture);
@@ -243,6 +253,16 @@ namespace CuteMediaPlayer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap SavedPlaylistIcon {
+            get {
+                object obj = ResourceManager.GetObject("SavedPlaylistIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ShuffleIcon {
             get {
                 object obj = ResourceManager.GetObject("ShuffleIcon", resourceCulture);
@@ -266,6 +286,16 @@ namespace CuteMediaPlayer.Properties {
         internal static System.Drawing.Bitmap ThemeIcon {
             get {
                 object obj = ResourceManager.GetObject("ThemeIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap VideoPlaceholderIcon {
+            get {
+                object obj = ResourceManager.GetObject("VideoPlaceholderIcon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

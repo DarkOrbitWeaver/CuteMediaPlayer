@@ -72,17 +72,16 @@
             panelPlaylist = new Panel();
             tabControl1 = new TabControl();
             tabCurrent = new TabPage();
+            panel4 = new Panel();
+            openMinimizedPlayer = new Button();
             btnAddToPlaylist = new Button();
-            listPlaylist = new ListBox();
-            menuPlaylist = new ContextMenuStrip(components);
-            playToolStripMenuItem = new ToolStripMenuItem();
-            addToPlaylistToolStripMenuItem = new ToolStripMenuItem();
-            removeToolStripMenuItem = new ToolStripMenuItem();
+            panel3 = new Panel();
+            customPlaylistPanel = new CustomPlaylistPanel();
             tabLibrary = new TabPage();
+            panel2 = new Panel();
             NewPlaylist = new Button();
-            listSavedPlaylists = new ListBox();
-            menuSavedPlaylists = new ContextMenuStrip(components);
-            deleteToolStripMenuItem = new ToolStripMenuItem();
+            panel1 = new Panel();
+            customPlaylistsPanel = new CustomPlaylistPanel();
             sparkleVisualizer1 = new SparkleVisualizer();
             controlPanel = new Panel();
             btnAddCurrentToPlaylist = new Button();
@@ -98,13 +97,18 @@
             btnNext = new Button();
             btnStop = new Button();
             btnChangeTheme = new Button();
+            menuPlaylist = new ContextMenuStrip(components);
+            playToolStripMenuItem = new ToolStripMenuItem();
+            addToPlaylistToolStripMenuItem = new ToolStripMenuItem();
+            removeToolStripMenuItem = new ToolStripMenuItem();
+            menuSavedPlaylists = new ContextMenuStrip(components);
+            deleteToolStripMenuItem = new ToolStripMenuItem();
             LoopBtnToolTip = new ToolTip(components);
             ChangeThemeBtnToolTip = new ToolTip(components);
             MuteBtnToolTip = new ToolTip(components);
             PlaylistTooltip = new ToolTip(components);
             AddToPlaylistTooltip = new ToolTip(components);
             ShufflePlaylistTooltip = new ToolTip(components);
-            openMinimizedPlayer = new Button();
             menuStrip1.SuspendLayout();
             videoPanel.SuspendLayout();
             vlcContainer.SuspendLayout();
@@ -112,12 +116,16 @@
             panelPlaylist.SuspendLayout();
             tabControl1.SuspendLayout();
             tabCurrent.SuspendLayout();
-            menuPlaylist.SuspendLayout();
+            panel4.SuspendLayout();
+            panel3.SuspendLayout();
             tabLibrary.SuspendLayout();
-            menuSavedPlaylists.SuspendLayout();
+            panel2.SuspendLayout();
+            panel1.SuspendLayout();
             controlPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)seekBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)volumeBar).BeginInit();
+            menuPlaylist.SuspendLayout();
+            menuSavedPlaylists.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
@@ -193,7 +201,7 @@
             // 
             // dancingGirlPictureBox
             // 
-            dancingGirlPictureBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            dancingGirlPictureBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             dancingGirlPictureBox.BackColor = Color.Transparent;
             dancingGirlPictureBox.Location = new Point(0, 356);
             dancingGirlPictureBox.Name = "dancingGirlPictureBox";
@@ -208,10 +216,10 @@
             panelPlaylist.BackColor = Color.FromArgb(255, 192, 192);
             panelPlaylist.Controls.Add(tabControl1);
             panelPlaylist.Dock = DockStyle.Right;
-            panelPlaylist.Location = new Point(696, 0);
+            panelPlaylist.Location = new Point(604, 0);
             panelPlaylist.Margin = new Padding(3, 4, 3, 4);
             panelPlaylist.Name = "panelPlaylist";
-            panelPlaylist.Size = new Size(286, 427);
+            panelPlaylist.Size = new Size(378, 427);
             panelPlaylist.TabIndex = 1;
             panelPlaylist.Visible = false;
             // 
@@ -225,29 +233,52 @@
             tabControl1.Margin = new Padding(3, 4, 3, 4);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(286, 427);
+            tabControl1.Size = new Size(378, 427);
             tabControl1.TabIndex = 0;
             // 
             // tabCurrent
             // 
             tabCurrent.BackColor = Color.FromArgb(254, 184, 195);
-            tabCurrent.Controls.Add(openMinimizedPlayer);
-            tabCurrent.Controls.Add(btnAddToPlaylist);
-            tabCurrent.Controls.Add(listPlaylist);
+            tabCurrent.Controls.Add(panel4);
+            tabCurrent.Controls.Add(panel3);
             tabCurrent.Location = new Point(4, 28);
             tabCurrent.Margin = new Padding(3, 4, 3, 4);
             tabCurrent.Name = "tabCurrent";
             tabCurrent.Padding = new Padding(3, 4, 3, 4);
-            tabCurrent.Size = new Size(278, 395);
+            tabCurrent.Size = new Size(370, 395);
             tabCurrent.TabIndex = 0;
             tabCurrent.Text = "Now Playing";
+            // 
+            // panel4
+            // 
+            panel4.Controls.Add(openMinimizedPlayer);
+            panel4.Controls.Add(btnAddToPlaylist);
+            panel4.Dock = DockStyle.Bottom;
+            panel4.Location = new Point(3, 348);
+            panel4.Name = "panel4";
+            panel4.Size = new Size(364, 43);
+            panel4.TabIndex = 1;
+            // 
+            // openMinimizedPlayer
+            // 
+            openMinimizedPlayer.BackColor = Color.FromArgb(255, 192, 192);
+            openMinimizedPlayer.Cursor = Cursors.Hand;
+            openMinimizedPlayer.Font = new Font("MS PGothic", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            openMinimizedPlayer.Location = new Point(184, 4);
+            openMinimizedPlayer.Margin = new Padding(3, 4, 3, 4);
+            openMinimizedPlayer.Name = "openMinimizedPlayer";
+            openMinimizedPlayer.Size = new Size(126, 36);
+            openMinimizedPlayer.TabIndex = 2;
+            openMinimizedPlayer.Text = "Minimzed";
+            openMinimizedPlayer.UseVisualStyleBackColor = false;
+            openMinimizedPlayer.Click += openMinimizedPlayer_Click;
             // 
             // btnAddToPlaylist
             // 
             btnAddToPlaylist.BackColor = Color.FromArgb(255, 192, 192);
             btnAddToPlaylist.Cursor = Cursors.Hand;
             btnAddToPlaylist.Font = new Font("MS PGothic", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            btnAddToPlaylist.Location = new Point(7, 354);
+            btnAddToPlaylist.Location = new Point(52, 4);
             btnAddToPlaylist.Margin = new Padding(3, 4, 3, 4);
             btnAddToPlaylist.Name = "btnAddToPlaylist";
             btnAddToPlaylist.Size = new Size(126, 36);
@@ -256,59 +287,47 @@
             btnAddToPlaylist.UseVisualStyleBackColor = false;
             btnAddToPlaylist.Click += btnAddToPlaylist_Click;
             // 
-            // listPlaylist
+            // panel3
             // 
-            listPlaylist.BackColor = Color.FromArgb(254, 184, 195);
-            listPlaylist.ContextMenuStrip = menuPlaylist;
-            listPlaylist.FormattingEnabled = true;
-            listPlaylist.ItemHeight = 19;
-            listPlaylist.Location = new Point(3, 4);
-            listPlaylist.Margin = new Padding(3, 4, 3, 4);
-            listPlaylist.Name = "listPlaylist";
-            listPlaylist.ScrollAlwaysVisible = true;
-            listPlaylist.Size = new Size(272, 327);
-            listPlaylist.TabIndex = 0;
-            listPlaylist.Click += listPlaylist_Click;
+            panel3.Controls.Add(customPlaylistPanel);
+            panel3.Dock = DockStyle.Fill;
+            panel3.Location = new Point(3, 4);
+            panel3.Name = "panel3";
+            panel3.Size = new Size(364, 387);
+            panel3.TabIndex = 0;
             // 
-            // menuPlaylist
+            // customPlaylistPanel
             // 
-            menuPlaylist.Items.AddRange(new ToolStripItem[] { playToolStripMenuItem, addToPlaylistToolStripMenuItem, removeToolStripMenuItem });
-            menuPlaylist.Name = "menuPlaylist";
-            menuPlaylist.Size = new Size(151, 70);
-            // 
-            // playToolStripMenuItem
-            // 
-            playToolStripMenuItem.Name = "playToolStripMenuItem";
-            playToolStripMenuItem.Size = new Size(150, 22);
-            playToolStripMenuItem.Text = "Play";
-            playToolStripMenuItem.Click += playToolStripMenuItem_Click;
-            // 
-            // addToPlaylistToolStripMenuItem
-            // 
-            addToPlaylistToolStripMenuItem.Name = "addToPlaylistToolStripMenuItem";
-            addToPlaylistToolStripMenuItem.Size = new Size(150, 22);
-            addToPlaylistToolStripMenuItem.Text = "Add to Playlist";
-            addToPlaylistToolStripMenuItem.Click += addToPlaylistToolStripMenuItem_Click;
-            // 
-            // removeToolStripMenuItem
-            // 
-            removeToolStripMenuItem.Name = "removeToolStripMenuItem";
-            removeToolStripMenuItem.Size = new Size(150, 22);
-            removeToolStripMenuItem.Text = "Remove";
-            removeToolStripMenuItem.Click += removeToolStripMenuItem_Click;
+            customPlaylistPanel.AutoScroll = true;
+            customPlaylistPanel.BackColor = Color.FromArgb(254, 184, 195);
+            customPlaylistPanel.Dock = DockStyle.Fill;
+            customPlaylistPanel.Location = new Point(0, 0);
+            customPlaylistPanel.Name = "customPlaylistPanel";
+            customPlaylistPanel.Size = new Size(364, 387);
+            customPlaylistPanel.TabIndex = 3;
+            customPlaylistPanel.MouseDown += CustomPanel_MouseDown;
             // 
             // tabLibrary
             // 
             tabLibrary.BackColor = Color.FromArgb(254, 184, 195);
-            tabLibrary.Controls.Add(NewPlaylist);
-            tabLibrary.Controls.Add(listSavedPlaylists);
+            tabLibrary.Controls.Add(panel2);
+            tabLibrary.Controls.Add(panel1);
             tabLibrary.Location = new Point(4, 28);
             tabLibrary.Margin = new Padding(3, 4, 3, 4);
             tabLibrary.Name = "tabLibrary";
             tabLibrary.Padding = new Padding(3, 4, 3, 4);
-            tabLibrary.Size = new Size(278, 395);
+            tabLibrary.Size = new Size(317, 395);
             tabLibrary.TabIndex = 1;
             tabLibrary.Text = "My Playlists";
+            // 
+            // panel2
+            // 
+            panel2.Controls.Add(NewPlaylist);
+            panel2.Dock = DockStyle.Bottom;
+            panel2.Location = new Point(3, 347);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(311, 44);
+            panel2.TabIndex = 3;
             // 
             // NewPlaylist
             // 
@@ -316,7 +335,7 @@
             NewPlaylist.BackColor = Color.FromArgb(254, 184, 195);
             NewPlaylist.Cursor = Cursors.Hand;
             NewPlaylist.Font = new Font("MS PGothic", 12F, FontStyle.Bold);
-            NewPlaylist.Location = new Point(38, 358);
+            NewPlaylist.Location = new Point(82, 7);
             NewPlaylist.Margin = new Padding(3, 4, 3, 4);
             NewPlaylist.Name = "NewPlaylist";
             NewPlaylist.Size = new Size(201, 33);
@@ -325,34 +344,25 @@
             NewPlaylist.UseVisualStyleBackColor = false;
             NewPlaylist.Click += NewPlaylist_Click;
             // 
-            // listSavedPlaylists
+            // panel1
             // 
-            listSavedPlaylists.BackColor = Color.FromArgb(254, 184, 195);
-            listSavedPlaylists.ContextMenuStrip = menuSavedPlaylists;
-            listSavedPlaylists.Dock = DockStyle.Top;
-            listSavedPlaylists.FormattingEnabled = true;
-            listSavedPlaylists.ItemHeight = 19;
-            listSavedPlaylists.Location = new Point(3, 4);
-            listSavedPlaylists.Margin = new Padding(3, 4, 3, 4);
-            listSavedPlaylists.Name = "listSavedPlaylists";
-            listSavedPlaylists.ScrollAlwaysVisible = true;
-            listSavedPlaylists.Size = new Size(272, 327);
-            listSavedPlaylists.TabIndex = 0;
-            listSavedPlaylists.DoubleClick += listSavedPlaylists_DoubleClick;
+            panel1.Controls.Add(customPlaylistsPanel);
+            panel1.Dock = DockStyle.Fill;
+            panel1.Location = new Point(3, 4);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(311, 387);
+            panel1.TabIndex = 2;
             // 
-            // menuSavedPlaylists
+            // customPlaylistsPanel
             // 
-            menuSavedPlaylists.Items.AddRange(new ToolStripItem[] { deleteToolStripMenuItem });
-            menuSavedPlaylists.Name = "menuSavedPlaylists";
-            menuSavedPlaylists.Size = new Size(108, 26);
-            menuSavedPlaylists.Opening += menuSavedPlaylists_Opening;
-            // 
-            // deleteToolStripMenuItem
-            // 
-            deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            deleteToolStripMenuItem.Size = new Size(107, 22);
-            deleteToolStripMenuItem.Text = "Delete";
-            deleteToolStripMenuItem.Click += deleteToolStripMenuItem_Click;
+            customPlaylistsPanel.AutoScroll = true;
+            customPlaylistsPanel.BackColor = Color.FromArgb(254, 184, 195);
+            customPlaylistsPanel.Dock = DockStyle.Fill;
+            customPlaylistsPanel.Location = new Point(0, 0);
+            customPlaylistsPanel.Name = "customPlaylistsPanel";
+            customPlaylistsPanel.Size = new Size(311, 387);
+            customPlaylistsPanel.TabIndex = 2;
+            customPlaylistsPanel.MouseDown += CustomPanel_MouseDown;
             // 
             // sparkleVisualizer1
             // 
@@ -365,7 +375,6 @@
             sparkleVisualizer1.Name = "sparkleVisualizer1";
             sparkleVisualizer1.Size = new Size(982, 427);
             sparkleVisualizer1.TabIndex = 0;
-            sparkleVisualizer1.UseIdleWallpaper = true;
             // 
             // controlPanel
             // 
@@ -610,6 +619,47 @@
             btnChangeTheme.UseVisualStyleBackColor = true;
             btnChangeTheme.Click += btnChangeTheme_Click;
             // 
+            // menuPlaylist
+            // 
+            menuPlaylist.Items.AddRange(new ToolStripItem[] { playToolStripMenuItem, addToPlaylistToolStripMenuItem, removeToolStripMenuItem });
+            menuPlaylist.Name = "menuPlaylist";
+            menuPlaylist.Size = new Size(151, 70);
+            // 
+            // playToolStripMenuItem
+            // 
+            playToolStripMenuItem.Name = "playToolStripMenuItem";
+            playToolStripMenuItem.Size = new Size(150, 22);
+            playToolStripMenuItem.Text = "Play";
+            playToolStripMenuItem.Click += playToolStripMenuItem_Click;
+            // 
+            // addToPlaylistToolStripMenuItem
+            // 
+            addToPlaylistToolStripMenuItem.Name = "addToPlaylistToolStripMenuItem";
+            addToPlaylistToolStripMenuItem.Size = new Size(150, 22);
+            addToPlaylistToolStripMenuItem.Text = "Add to Playlist";
+            addToPlaylistToolStripMenuItem.Click += addToPlaylistToolStripMenuItem_Click;
+            // 
+            // removeToolStripMenuItem
+            // 
+            removeToolStripMenuItem.Name = "removeToolStripMenuItem";
+            removeToolStripMenuItem.Size = new Size(150, 22);
+            removeToolStripMenuItem.Text = "Remove";
+            removeToolStripMenuItem.Click += removeToolStripMenuItem_Click;
+            // 
+            // menuSavedPlaylists
+            // 
+            menuSavedPlaylists.Items.AddRange(new ToolStripItem[] { deleteToolStripMenuItem });
+            menuSavedPlaylists.Name = "menuSavedPlaylists";
+            menuSavedPlaylists.Size = new Size(108, 26);
+            menuSavedPlaylists.Opening += menuSavedPlaylists_Opening;
+            // 
+            // deleteToolStripMenuItem
+            // 
+            deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            deleteToolStripMenuItem.Size = new Size(107, 22);
+            deleteToolStripMenuItem.Text = "Delete";
+            deleteToolStripMenuItem.Click += deleteToolStripMenuItem_Click;
+            // 
             // LoopBtnToolTip
             // 
             LoopBtnToolTip.AutoPopDelay = 5000;
@@ -627,20 +677,6 @@
             MuteBtnToolTip.AutoPopDelay = 5000;
             MuteBtnToolTip.InitialDelay = 800;
             MuteBtnToolTip.ReshowDelay = 100;
-            // 
-            // openMinimizedPlayer
-            // 
-            openMinimizedPlayer.BackColor = Color.FromArgb(255, 192, 192);
-            openMinimizedPlayer.Cursor = Cursors.Hand;
-            openMinimizedPlayer.Font = new Font("MS PGothic", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            openMinimizedPlayer.Location = new Point(139, 354);
-            openMinimizedPlayer.Margin = new Padding(3, 4, 3, 4);
-            openMinimizedPlayer.Name = "openMinimizedPlayer";
-            openMinimizedPlayer.Size = new Size(126, 36);
-            openMinimizedPlayer.TabIndex = 2;
-            openMinimizedPlayer.Text = "Minimzed";
-            openMinimizedPlayer.UseVisualStyleBackColor = false;
-            openMinimizedPlayer.Click += openMinimizedPlayer_Click;
             // 
             // Form1
             // 
@@ -668,13 +704,17 @@
             panelPlaylist.ResumeLayout(false);
             tabControl1.ResumeLayout(false);
             tabCurrent.ResumeLayout(false);
-            menuPlaylist.ResumeLayout(false);
+            panel4.ResumeLayout(false);
+            panel3.ResumeLayout(false);
             tabLibrary.ResumeLayout(false);
-            menuSavedPlaylists.ResumeLayout(false);
+            panel2.ResumeLayout(false);
+            panel1.ResumeLayout(false);
             controlPanel.ResumeLayout(false);
             controlPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)seekBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)volumeBar).EndInit();
+            menuPlaylist.ResumeLayout(false);
+            menuSavedPlaylists.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -707,14 +747,12 @@
         private Button openPlaylist;
         private Button shuffle;
         private Panel panelPlaylist;
-        private ListBox listPlaylist;
         private ContextMenuStrip menuPlaylist;
         private ToolStripMenuItem playToolStripMenuItem;
         private ToolStripMenuItem removeToolStripMenuItem;
         private TabControl tabControl1;
         private TabPage tabCurrent;
         private TabPage tabLibrary;
-        private ListBox listSavedPlaylists;
         private Button NewPlaylist;
         private ContextMenuStrip menuSavedPlaylists;
         private ToolStripMenuItem deleteToolStripMenuItem;
@@ -726,5 +764,11 @@
         private ToolTip ShufflePlaylistTooltip;
         private PictureBox dancingGirlPictureBox;
         private Button openMinimizedPlayer;
+        private CustomPlaylistPanel customPlaylistPanel;
+        private CustomPlaylistPanel customPlaylistsPanel;
+        private Panel panel2;
+        private Panel panel1;
+        private Panel panel4;
+        private Panel panel3;
     }
 }

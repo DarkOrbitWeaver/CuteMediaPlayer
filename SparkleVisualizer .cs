@@ -22,18 +22,18 @@ namespace CuteMediaPlayer
         private int currentColorScheme = 5; // white color as default
 
         // background
-        private Image idleWallpaper;
-        private bool useIdleWallpaper = true;
+        //private Image idleWallpaper;
+        //private bool useIdleWallpaper = true;
 
-        public bool UseIdleWallpaper
-        {
-            get { return useIdleWallpaper; }
-            set
-            {
-                useIdleWallpaper = value;
-                Invalidate(); // Redraw when changed
-            }
-        }
+        //public bool UseIdleWallpaper
+        //{
+        //    get { return useIdleWallpaper; }
+        //    set
+        //    {
+        //        useIdleWallpaper = value;
+        //        Invalidate(); // Redraw when changed
+        //    }
+        //}
 
 
         public SparkleVisualizer()
@@ -81,11 +81,11 @@ namespace CuteMediaPlayer
             if (IsIdleMode)
             {
                 // Draw wallpaper if available and enabled
-                if (idleWallpaper != null && useIdleWallpaper)
-                {
-                    // Draw the wallpaper to fill the control
-                    e.Graphics.DrawImage(idleWallpaper, ClientRectangle);
-                }
+                //if (idleWallpaper != null && useIdleWallpaper)
+                //{
+                //    // Draw the wallpaper to fill the control
+                //    e.Graphics.DrawImage(idleWallpaper, ClientRectangle);
+                //}
                 //else
                 //{
                 //    // Original background drawing code (black)

@@ -171,7 +171,7 @@ namespace CuteMediaPlayer
             else if (mediaLoaded && !isAudioFile)
             {
                 sparkleVisualizer1.Visible = false;
-                sparkleVisualizer1.UseIdleWallpaper = false;
+                //sparkleVisualizer1.UseIdleWallpaper = false;
                 dancingGirlPictureBox.Visible = false;
             }
             // If nothing is loaded, show idle visualizer

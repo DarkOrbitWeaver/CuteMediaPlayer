@@ -221,14 +221,7 @@ namespace CuteMediaPlayer
                 UpdateWindowTitle();
 
                 // Highlight current track in playlist
-                for (int i = 0; i < listPlaylist.Items.Count; i++)
-                {
-                    if (i == currentTrackIndex)
-                    {
-                        listPlaylist.SelectedIndex = i;
-                        break;
-                    }
-                }
+                customPlaylistPanel.SelectTrack(currentTrackIndex);
             }
             catch (Exception ex)
             {
