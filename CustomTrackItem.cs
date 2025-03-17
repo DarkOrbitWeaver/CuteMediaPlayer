@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
@@ -49,14 +49,17 @@ namespace CuteMediaPlayer
             pictureAlbumArt.MouseEnter += (s, e) => this.OnMouseEnter(e);
             pictureAlbumArt.MouseLeave += (s, e) => this.OnMouseLeave(e);
             pictureAlbumArt.Click += (s, e) => this.OnClick(e);
+            lblDuration.Click += (s, e) => this.OnClick(e);
 
             lblTitle.MouseEnter += (s, e) => this.OnMouseEnter(e);
             lblTitle.MouseLeave += (s, e) => this.OnMouseLeave(e);
             lblTitle.Click += (s, e) => this.OnClick(e);
+            lblDuration.Click += (s, e) => this.OnClick(e);
 
             lblArtist.MouseEnter += (s, e) => this.OnMouseEnter(e);
             lblArtist.MouseLeave += (s, e) => this.OnMouseLeave(e);
             lblArtist.Click += (s, e) => this.OnClick(e);
+            lblDuration.Click += (s, e) => this.OnClick(e);
 
             // Create a basic menu first - we'll update it in SetTrackData
             trackMenu = new ContextMenuStrip();
@@ -80,7 +83,7 @@ namespace CuteMediaPlayer
                 trackMenu.Items.Add(deletePlaylistItem);
 
                 // Extract clean playlist name
-                this.Title = filePath.Replace("PLAYLIST:", "");
+                this.Title = filePath.Replace("PLAYLIST:", "").Trim();
                 this.Artist = "Playlist";
                 Debug.WriteLine($"Setting playlist item: {this.Title}");
 
@@ -296,8 +299,9 @@ namespace CuteMediaPlayer
         public event EventHandler TrackRemoved;
 
         // 🗂️ Playlist deletion logic
-        private void DeletePlaylistItem_Click(object sender, EventArgs e)
-        {
+private void DeletePlaylistItem_Click(object sender, EventArgs e)
+{
+    Debug.WriteLine($"Attempting to delete playlist: '{this.Title}'");
             DialogResult result = MessageBox.Show(
                 $"Delete playlist '{this.Title}'?",
                 "Confirm",

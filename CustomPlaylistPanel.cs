@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Forms;
 using System.IO;
 
@@ -19,6 +20,7 @@ namespace CuteMediaPlayer
         public event PlaylistItemEventHandler PlaylistDeleted;
 
         public event EventHandler<CustomTrackItem> AddToPlaylistRequested;
+        public event EventHandler<string> TrackRemovedFromPlaylist;
 
         public CustomPlaylistPanel()
         {
@@ -56,8 +58,11 @@ namespace CuteMediaPlayer
             {
                 this.Controls.Remove(item);
                 trackItems.Remove(item);
-                ReorderTrackPositions(); // 🔄 Re-stack tracks
+                ReorderTrackPositions();
                 ShowListIsEmptyLabel();
+
+                // 🚨 Fire the new event (sends track path to parent)
+                TrackRemovedFromPlaylist?.Invoke(this, item.FilePath);
             };
 
             item.AddToPlaylistRequested += (s, e) =>
@@ -89,7 +94,8 @@ namespace CuteMediaPlayer
                 item.PlaylistDeleted += (s, e) =>
                 {
                     // Pass the event up to parent
-                    PlaylistDeleted?.Invoke(this, item); 
+                Debug.WriteLine($"Playlist '{item.Title}' deletion event received.");
+                PlaylistDeleted?.Invoke(this, item);
                 };
             }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -80,7 +81,8 @@ namespace CuteMediaPlayer
                 {
                     var pl = new Playlist
                     {
-                        Name = Path.GetFileNameWithoutExtension(file),
+                        // Trim the playlist name to remove leading/trailing spaces
+                        Name = Path.GetFileNameWithoutExtension(file).Trim(),
                         Tracks = File.ReadAllLines(file)
                                       .Where(line => File.Exists(line))
                                       .ToList()
@@ -93,13 +95,10 @@ namespace CuteMediaPlayer
                 }
             }
 
-            // Clear existing items
+            // Refresh the playlists panel
             customPlaylistsPanel.ClearTracks();
-
-            // Add playlist items
             foreach (var playlist in allPlaylists)
             {
-                // Add playlist as a special item
                 customPlaylistsPanel.AddTrack($"PLAYLIST:{playlist.Name}");
             }
         }
@@ -350,17 +349,37 @@ namespace CuteMediaPlayer
 
             customPlaylistsPanel.PlaylistDeleted += (s, e) =>
             {
-                CustomTrackItem item = s as CustomTrackItem;
+ 
+                CustomTrackItem item = e as CustomTrackItem;
+                Debug.WriteLine("file path" + item?.FilePath.StartsWith("P"));
+
                 if (item != null && item.FilePath.StartsWith("PLAYLIST:"))
                 {
                     try
                     {
-                        int index = allPlaylists.FindIndex(p => p.Name == item.Title);
+                        int index = allPlaylists.FindIndex(p => string.Equals(p.Name, item.Title, StringComparison.OrdinalIgnoreCase));
                         if (index != -1)
                         {
-                            allPlaylists.RemoveAt(index);
+                            string playlistPath = Path.Combine(playlistsFolder, $"{allPlaylists[index].Name}.m3u");
+                            if (File.Exists(playlistPath))
+                            {
+                                File.Delete(playlistPath); // 🗑️ Delete the file
+                                Debug.WriteLine("deleted the file?");
+                            }
+                            Debug.WriteLine("here at " + index);
+                            allPlaylists.RemoveAt(index); // Remove from list
+
+                            // 🔥 NEW: Force-refresh the playlists panel
                             customPlaylistsPanel.ClearTracks();
-                            allPlaylists.ForEach(pl => customPlaylistsPanel.AddTrack($"PLAYLIST:{pl.Name}"));
+                            Debug.WriteLine("here at this cleartracks shit");
+
+                            foreach (var pl in allPlaylists)
+                            {
+                                customPlaylistsPanel.AddTrack($"PLAYLIST:{pl.Name}");
+                            }
+
+                            customPlaylistsPanel.Refresh(); // ⚡ Force UI update
+                            Debug.WriteLine("FORCE MY RRRR");
                             SaveAllPlaylists();
                         }
                     }
@@ -388,6 +407,15 @@ namespace CuteMediaPlayer
                     }
                 };
             });
+            customPlaylistPanel.TrackRemovedFromPlaylist += (sender, trackPath) =>
+            {
+                if (currentPlaylist != null && currentPlaylist.Tracks.Contains(trackPath))
+                {
+                    currentPlaylist.Tracks.Remove(trackPath);
+                    SaveAllPlaylists(); // 💾 Save to file
+                    SyncPlaylistToUI(); // 🔄 Update UI
+                }
+            };
         }
 
 

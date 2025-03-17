@@ -284,7 +284,7 @@
             openMinimizedPlayer.Location = new Point(184, 4);
             openMinimizedPlayer.Margin = new Padding(3, 4, 3, 4);
             openMinimizedPlayer.Name = "openMinimizedPlayer";
-            openMinimizedPlayer.Size = new Size(126, 36);
+            openMinimizedPlayer.Size = new Size(134, 36);
             openMinimizedPlayer.TabIndex = 2;
             openMinimizedPlayer.Text = "Minimzed";
             openMinimizedPlayer.UseVisualStyleBackColor = false;
@@ -295,12 +295,12 @@
             btnAddToPlaylist.BackColor = Color.FromArgb(255, 192, 192);
             btnAddToPlaylist.Cursor = Cursors.Hand;
             btnAddToPlaylist.Font = new Font("MS PGothic", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            btnAddToPlaylist.Location = new Point(52, 4);
+            btnAddToPlaylist.Location = new Point(43, 4);
             btnAddToPlaylist.Margin = new Padding(3, 4, 3, 4);
             btnAddToPlaylist.Name = "btnAddToPlaylist";
-            btnAddToPlaylist.Size = new Size(126, 36);
+            btnAddToPlaylist.Size = new Size(135, 36);
             btnAddToPlaylist.TabIndex = 1;
-            btnAddToPlaylist.Text = "Add Songs";
+            btnAddToPlaylist.Text = "Save Songs";
             btnAddToPlaylist.UseVisualStyleBackColor = false;
             btnAddToPlaylist.Click += btnAddToPlaylist_Click;
             // 
@@ -332,7 +332,7 @@
             tabLibrary.Margin = new Padding(3, 4, 3, 4);
             tabLibrary.Name = "tabLibrary";
             tabLibrary.Padding = new Padding(3, 4, 3, 4);
-            tabLibrary.Size = new Size(378, 395);
+            tabLibrary.Size = new Size(359, 395);
             tabLibrary.TabIndex = 1;
             tabLibrary.Text = "My Playlists";
             // 
@@ -342,7 +342,7 @@
             savedPlaylistsButtonContainer.Dock = DockStyle.Bottom;
             savedPlaylistsButtonContainer.Location = new Point(3, 347);
             savedPlaylistsButtonContainer.Name = "savedPlaylistsButtonContainer";
-            savedPlaylistsButtonContainer.Size = new Size(372, 44);
+            savedPlaylistsButtonContainer.Size = new Size(353, 44);
             savedPlaylistsButtonContainer.TabIndex = 3;
             // 
             // NewPlaylist
@@ -366,7 +366,7 @@
             panel1.Dock = DockStyle.Fill;
             panel1.Location = new Point(3, 4);
             panel1.Name = "panel1";
-            panel1.Size = new Size(372, 387);
+            panel1.Size = new Size(353, 387);
             panel1.TabIndex = 2;
             // 
             // customPlaylistsPanel
@@ -376,7 +376,7 @@
             customPlaylistsPanel.Dock = DockStyle.Fill;
             customPlaylistsPanel.Location = new Point(0, 0);
             customPlaylistsPanel.Name = "customPlaylistsPanel";
-            customPlaylistsPanel.Size = new Size(372, 387);
+            customPlaylistsPanel.Size = new Size(353, 387);
             customPlaylistsPanel.TabIndex = 2;
             // 
             // sparkleVisualizer1
