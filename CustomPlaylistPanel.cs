@@ -15,6 +15,11 @@ namespace CuteMediaPlayer
         // one for adding new songs via explorer
         public event EventHandler AddSongsClicked;
 
+        public delegate void PlaylistItemEventHandler(object sender, CustomTrackItem item);
+        public event PlaylistItemEventHandler PlaylistDeleted;
+
+        public event EventHandler<CustomTrackItem> AddToPlaylistRequested;
+
         public CustomPlaylistPanel()
         {
             InitializeComponent();
@@ -43,9 +48,23 @@ namespace CuteMediaPlayer
         // ➕ Add a single track
         public void AddTrack(string filePath)
         {
-            // Create new track item
             CustomTrackItem item = new CustomTrackItem();
             item.SetTrackData(filePath);
+
+            // 🎧 Listen for removal events
+            item.TrackRemoved += (s, e) =>
+            {
+                this.Controls.Remove(item);
+                trackItems.Remove(item);
+                ReorderTrackPositions(); // 🔄 Re-stack tracks
+                ShowListIsEmptyLabel();
+            };
+
+            item.AddToPlaylistRequested += (s, e) =>
+            {
+                // Forward the event to the parent control with the track item
+                AddToPlaylistRequested?.Invoke(this, item);
+            };
 
             // Set position (stack from top)
             item.Width = this.ClientSize.Width;
@@ -64,8 +83,28 @@ namespace CuteMediaPlayer
                 TrackSelected?.Invoke(this, item);
             };
 
+            // Handle playlist events if needed
+            if (filePath.StartsWith("PLAYLIST:"))
+            {
+                item.PlaylistDeleted += (s, e) =>
+                {
+                    // Pass the event up to parent
+                    PlaylistDeleted?.Invoke(this, item); 
+                };
+            }
+
             // toggle empty label visiblity
             ShowListIsEmptyLabel();
+        }
+
+
+        // 🔄 Reset track positions after removal
+        private void ReorderTrackPositions()
+        {
+            for (int i = 0; i < trackItems.Count; i++)
+            {
+                trackItems[i].Top = i * trackItems[i].Height;
+            }
         }
 
         // 🗑️ Clear all tracks

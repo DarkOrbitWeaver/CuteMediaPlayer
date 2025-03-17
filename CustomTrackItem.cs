@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using Timer = System.Windows.Forms.Timer;
 
 namespace CuteMediaPlayer
 {
@@ -19,10 +20,21 @@ namespace CuteMediaPlayer
         private Color selectedBackColor = Color.FromArgb(254, 184, 195);
         private Color playingBackColor = Color.FromArgb(255, 160, 180);
 
-        // 📦 Default constructor
+        private ContextMenuStrip trackMenu;
+
+        //// fire animation
+        //private Bitmap spriteSheet;      // Holds the sprite sheet image Small_Iceball_9x24
+        //private int currentFrame = 0;    // Tracks the current frame index
+        //private int totalFrames = 60;     // Total frames in the sprite sheet
+        //private int frameWidth = 9;    // Width of each frame (adjust to your image)
+        //private int frameHeight = 24;  // Height of each frame
+        //private Timer animationTimer;
+
+        //
         public CustomTrackItem()
         {
             InitializeComponent();
+            //LoadAnimationAssets();
 
             // 🖌️ Set up appearance
             this.BackColor = normalBackColor;
@@ -37,14 +49,18 @@ namespace CuteMediaPlayer
             pictureAlbumArt.MouseEnter += (s, e) => this.OnMouseEnter(e);
             pictureAlbumArt.MouseLeave += (s, e) => this.OnMouseLeave(e);
             pictureAlbumArt.Click += (s, e) => this.OnClick(e);
-            
+
             lblTitle.MouseEnter += (s, e) => this.OnMouseEnter(e);
             lblTitle.MouseLeave += (s, e) => this.OnMouseLeave(e);
             lblTitle.Click += (s, e) => this.OnClick(e);
-            
+
             lblArtist.MouseEnter += (s, e) => this.OnMouseEnter(e);
             lblArtist.MouseLeave += (s, e) => this.OnMouseLeave(e);
             lblArtist.Click += (s, e) => this.OnClick(e);
+
+            // Create a basic menu first - we'll update it in SetTrackData
+            trackMenu = new ContextMenuStrip();
+            this.ContextMenuStrip = trackMenu;
         }
 
         // 🚀 Initialize with track data
@@ -53,9 +69,16 @@ namespace CuteMediaPlayer
             Debug.WriteLine($"### SetTrackData - {filePath} ###");
             this.FilePath = filePath;
 
-            // Check if it's a playlist item
+            // Now that we have the FilePath, set up the proper context menu
+            trackMenu.Items.Clear();
+
             if (filePath.StartsWith("PLAYLIST:"))
             {
+                // 🗂️ Playlist-specific menu
+                ToolStripMenuItem deletePlaylistItem = new ToolStripMenuItem("Delete Playlist");
+                deletePlaylistItem.Click += DeletePlaylistItem_Click;
+                trackMenu.Items.Add(deletePlaylistItem);
+
                 // Extract clean playlist name
                 this.Title = filePath.Replace("PLAYLIST:", "");
                 this.Artist = "Playlist";
@@ -76,6 +99,21 @@ namespace CuteMediaPlayer
                     pictureAlbumArt.Image = Properties.Resources.MusicPlaceholderIcon;
                 }
                 return;
+            }
+            else
+            {
+                // 🎵 Track-specific menu
+                ToolStripMenuItem playItem = new ToolStripMenuItem("Play");
+                ToolStripMenuItem removeItem = new ToolStripMenuItem("Remove");
+                ToolStripMenuItem addToPlaylistItem = new ToolStripMenuItem("Add to Playlist...");
+
+                playItem.Click += (s, e) => OnTrackSelected(EventArgs.Empty);
+                removeItem.Click += RemoveItem_Click;
+                addToPlaylistItem.Click += AddToPlaylistItem_Click;
+
+                trackMenu.Items.Add(playItem);
+                trackMenu.Items.Add(removeItem);
+                trackMenu.Items.Add(addToPlaylistItem);
             }
 
             // Handle regular media files
@@ -189,16 +227,17 @@ namespace CuteMediaPlayer
         public void SetPlaying(bool isPlaying)
         {
             this.IsPlaying = isPlaying;
+            //animationTimer.Enabled = isPlaying; // Start/stop the timer for fire animation
 
             if (isPlaying)
             {
                 this.BackColor = playingBackColor;
-                lblPlayingIndicator.Visible = true;
+                //lblPlayingIndicator.Visible = true;
             }
             else
             {
                 this.BackColor = normalBackColor;
-                lblPlayingIndicator.Visible = false;
+                //lblPlayingIndicator.Visible = false;
             }
         }
 
@@ -234,6 +273,107 @@ namespace CuteMediaPlayer
         {
             TrackSelected?.Invoke(this, e);
         }
+
+
+        // 🗑️ Handle remove click
+        private void RemoveItem_Click(object sender, EventArgs e)
+        {
+            // 🚨 Confirm deletion with track name
+            DialogResult result = MessageBox.Show(
+                $"Delete '{this.Title}' from playlist?",
+                "Confirm",
+                MessageBoxButtons.YesNo
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                // 🎵 Notify parent to remove this track
+                OnTrackRemoved(EventArgs.Empty);
+            }
+        }
+
+        // 📣 New event for removal
+        public event EventHandler TrackRemoved;
+
+        // 🗂️ Playlist deletion logic
+        private void DeletePlaylistItem_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show(
+                $"Delete playlist '{this.Title}'?",
+                "Confirm",
+                MessageBoxButtons.YesNo
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                // 🎯 Notify parent to delete this playlist
+                OnPlaylistDeleted(EventArgs.Empty);
+            }
+        }
+        // 📣 New event for playlist deletion
+        public event EventHandler PlaylistDeleted;
+        protected virtual void OnPlaylistDeleted(EventArgs e)
+        {
+            PlaylistDeleted?.Invoke(this, e);
+        }
+
+        // ➕ Add to playlist logic
+        private void AddToPlaylistItem_Click(object sender, EventArgs e)
+        {
+            // 🎯 Notify parent to add this track to a playlist
+            OnAddToPlaylistRequested(EventArgs.Empty);
+        }
+
+        public event EventHandler AddToPlaylistRequested;
+        protected virtual void OnAddToPlaylistRequested(EventArgs e)
+        {
+            AddToPlaylistRequested?.Invoke(this, e);
+        }
+        protected virtual void OnTrackRemoved(EventArgs e)
+        {
+            TrackRemoved?.Invoke(this, e);
+        }
+        // small fire (playing indicator Animation)
+
+        //private void LoadAnimationAssets()
+        //{
+        //    spriteSheet = new Bitmap(Properties.Resources.playingAnimationSprite);
+        //    lblPlayingIndicator.Size = new Size(frameWidth, frameHeight);
+
+        //    // Initialize timer
+        //    animationTimer = new Timer();
+        //    animationTimer.Interval = 100;
+        //    animationTimer.Tick += AnimateFireSprite;
+        //    animationTimer.Enabled = false; // Start disabled
+        //}
+
+        ////private void AnimateFireSprite(object sender, EventArgs e)
+        //{
+        //    // Update frame index and check bounds
+        //    currentFrame = (currentFrame + 1) % totalFrames;
+        //    int x = currentFrame * frameWidth;
+        //    if (x + frameWidth > spriteSheet.Width)
+        //    {
+        //        // Adjust if the calculated frame is outside the image bounds
+        //        currentFrame = 0;
+        //        x = 0;
+        //    }
+        //    Rectangle srcRect = new Rectangle(x, 0, frameWidth, frameHeight);
+
+        //    // Dispose the previous image if it exists
+        //    if (lblPlayingIndicator.BackgroundImage != null)
+        //    {
+        //        lblPlayingIndicator.BackgroundImage.Dispose();
+        //    }
+
+        //    // Clone the current frame from the sprite sheet
+        //    Bitmap newFrame = spriteSheet.Clone(srcRect, spriteSheet.PixelFormat);
+
+        //    // Update the label's background image with the new frame
+        //    lblPlayingIndicator.BackgroundImage = newFrame;
+        //}
+
+
 
     }
 }

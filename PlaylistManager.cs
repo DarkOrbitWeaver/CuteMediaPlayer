@@ -223,21 +223,6 @@ namespace CuteMediaPlayer
         }
 
 
-        private void removeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            // Get the selected track
-            CustomTrackItem selectedItem = GetSelectedTrackItem();
-            if (selectedItem == null) return;
-
-            int index = currentPlaylist.Tracks.IndexOf(selectedItem.FilePath);
-            if (index != -1)
-            {
-                // Remove from both playlist and control
-                currentPlaylist.Tracks.RemoveAt(index);
-                SyncPlaylistToUI();
-            }
-        }
-
         // shuffle 
         private void shuffle_Click(object sender, EventArgs e)
         {
@@ -277,68 +262,6 @@ namespace CuteMediaPlayer
         }
 
         // playlist managment
-        private void menuSavedPlaylists_Opening(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            // Check if the right-clicked item is a playlist
-            var item = GetSelectedTrackItem();
-            deleteToolStripMenuItem.Enabled = (item != null) && item.FilePath.StartsWith("PLAYLIST:");
-        }
-
-        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var selectedItem = GetSelectedTrackItem();
-            if (selectedItem == null) return;
-
-            // Confirm deletion with cute message 💬
-            DialogResult result = MessageBox.Show("Delete this playlist forever?",
-                "So sad... 😢",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
-
-            if (result == DialogResult.Yes)
-            {
- 
-                try
-                {
-                    int index = allPlaylists.FindIndex(p => p.Name == selectedItem.Title);
-                    if (index != -1)
-                    {
-                        allPlaylists.RemoveAt(index);
-                        customPlaylistsPanel.ClearTracks();
-                        allPlaylists.ForEach(pl => customPlaylistsPanel.AddTrack($"PLAYLIST:{pl.Name}"));
-                        SaveAllPlaylists();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error deleting playlist: {ex.Message}");
-                    return;
-                }
-
-            }
-        }
-
-        // when i right click song and play it
-        private void playToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            // Get the selected track
-            CustomTrackItem selectedItem = GetSelectedTrackItem();
-            if (selectedItem == null) return;
-
-            int index = currentPlaylist.Tracks.IndexOf(selectedItem.FilePath);
-            if (index != -1)
-            {
-                // Update current track index
-                currentTrackIndex = index;
-
-                // Play the selected track
-                PlayCurrentTrack();
-
-                // Update UI
-                UpdateButtonStates();
-                UpdateButtonImages();
-            }
-        }
 
 
         // keep the playlist in sync
@@ -353,6 +276,7 @@ namespace CuteMediaPlayer
                 if (currentTrackIndex >= 0 && currentTrackIndex < currentPlaylist.Tracks.Count)
                 {
                     customPlaylistPanel.SelectTrack(currentTrackIndex);
+                    UpdatePlaylistTitleDisplay();
                 }
 
                 // Make sure playlist reference is in sync
@@ -364,33 +288,6 @@ namespace CuteMediaPlayer
             }
         }
 
-        // adding songs to a playlist via the right click
-        private void addToPlaylistToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            // Get the selected track
-            CustomTrackItem selectedItem = GetSelectedTrackItem();
-            if (selectedItem == null) return;
-
-            // Get selected song path
-            string selectedFile = selectedItem.FilePath;
-
-            // Select target playlist
-            Playlist target = SelectPlaylistDialog();
-            if (target == null) return;
-
-            // Check for existing
-            if (!target.Tracks.Contains(selectedFile))
-            {
-                // Add to existing tracks
-                target.Tracks.Add(selectedFile);
-                SaveAllPlaylists();
-                MessageBox.Show("Added to playlist!");
-            }
-            else
-            {
-                MessageBox.Show("Song already exists in this playlist!");
-            }
-        }
 
         // adding songs to a playlist
         private void btnAddToPlaylist_Click(object sender, EventArgs e)
@@ -420,35 +317,6 @@ namespace CuteMediaPlayer
             MessageBox.Show($"Added to '{target.Name}'! (¬_¬\")");
         }
 
-        private void btnAddCurrentToPlaylist_Click(object sender, EventArgs e)
-        {
-            // Check if any track is playing
-            if (currentTrackIndex == -1 || playlist.Count == 0)
-            {
-                MessageBox.Show("No track is playing!");
-                return;
-            }
-
-            // Get current track
-            string currentFile = playlist[currentTrackIndex];
-
-            // Select target playlist
-            Playlist target = SelectPlaylistDialog();
-            if (target == null) return;
-
-            // Check if already exists
-            if (!target.Tracks.Contains(currentFile))
-            {
-                // Add to existing tracks (this is the fix - we're adding to the existing list)
-                target.Tracks.Add(currentFile);
-                SaveAllPlaylists();
-                MessageBox.Show("Added current song to playlist!");
-            }
-            else
-            {
-                MessageBox.Show("Song already exists in this playlist!");
-            }
-        }
 
 
         // ui
@@ -458,9 +326,8 @@ namespace CuteMediaPlayer
             customPlaylistPanel = new CustomPlaylistPanel();
             customPlaylistPanel.Dock = DockStyle.Fill;
             customPlaylistPanel.TrackSelected += CustomPlaylistPanel_TrackSelected;
+            customPlaylistPanel.AddToPlaylistRequested += CustomPlaylistPanel_AddToPlaylistRequested;
 
-            // 📦 Create context menu for tracks
-            customPlaylistPanel.ContextMenuStrip = menuPlaylist;
 
             // 🗂️ Create custom playlists panel for My Playlists
             customPlaylistsPanel = new CustomPlaylistPanel();
@@ -470,7 +337,6 @@ namespace CuteMediaPlayer
 
             // ➕ Replace the ListBox controls with our custom panels
             tabCurrent.Controls.Add(customPlaylistPanel);
-
             tabLibrary.Controls.Add(customPlaylistsPanel);
 
             // 🔄 Set tab order
@@ -481,6 +347,47 @@ namespace CuteMediaPlayer
             {
                 OpenToolStripMenuItemHelper(); // 🔗 Connect to existing open dialog
             };
+
+            customPlaylistsPanel.PlaylistDeleted += (s, e) =>
+            {
+                CustomTrackItem item = s as CustomTrackItem;
+                if (item != null && item.FilePath.StartsWith("PLAYLIST:"))
+                {
+                    try
+                    {
+                        int index = allPlaylists.FindIndex(p => p.Name == item.Title);
+                        if (index != -1)
+                        {
+                            allPlaylists.RemoveAt(index);
+                            customPlaylistsPanel.ClearTracks();
+                            allPlaylists.ForEach(pl => customPlaylistsPanel.AddTrack($"PLAYLIST:{pl.Name}"));
+                            SaveAllPlaylists();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error deleting playlist: {ex.Message}");
+                    }
+                }
+            };
+            customPlaylistPanel.Controls.OfType<CustomTrackItem>().ToList().ForEach(item =>
+            {
+                item.AddToPlaylistRequested += (s, e) =>
+                {
+                    CustomTrackItem trackItem = s as CustomTrackItem;
+                    if (trackItem != null)
+                    {
+                        // Use existing logic to add track to playlist
+                        Playlist target = SelectPlaylistDialog();
+                        if (target != null && !target.Tracks.Contains(trackItem.FilePath))
+                        {
+                            target.Tracks.Add(trackItem.FilePath);
+                            SaveAllPlaylists();
+                            MessageBox.Show("Added to playlist!");
+                        }
+                    }
+                };
+            });
         }
 
 
@@ -527,6 +434,7 @@ namespace CuteMediaPlayer
 
                 // Update UI
                 customPlaylistPanel.SetTracks(currentPlaylist.Tracks);
+                UpdatePlaylistTitleDisplay();
 
                 // 🎵 Auto-play first track if playlist isn't empty
                 if (playlist.Count > 0)
@@ -545,58 +453,42 @@ namespace CuteMediaPlayer
             }
         }
 
-        // 🔍 Gets selected track item from EITHER playlist or track context menu
-        private CustomTrackItem GetSelectedTrackItem()
+        private void CustomPlaylistPanel_AddToPlaylistRequested(object sender, CustomTrackItem track)
         {
-            // Check both possible context menu sources
-            var sourcePanel = menuPlaylist.SourceControl ?? menuSavedPlaylists.SourceControl;
+            // Use existing logic from SelectPlaylistDialog
+            Playlist target = SelectPlaylistDialog();
 
-            if (sourcePanel is CustomPlaylistPanel panel)
+            if (target != null)
             {
-                // Get click position relative to the panel
-                Point clickPos = panel.PointToClient(Cursor.Position);
-
-                // Find control at click position
-                Control clickedControl = panel.GetChildAtPoint(clickPos);
-
-                // Return if it's a track item
-                return clickedControl as CustomTrackItem;
+                // Check if track already exists in the playlist
+                if (!target.Tracks.Contains(track.FilePath))
+                {
+                    target.Tracks.Add(track.FilePath);
+                    SaveAllPlaylists();
+                    MessageBox.Show($"Added '{track.Title}' to playlist '{target.Name}'!");
+                }
+                else
+                {
+                    MessageBox.Show("This track is already in the selected playlist!");
+                }
             }
-            return null;
         }
 
-
-
-
-        // for the new ui
-        private void CustomPanel_MouseDown(object sender, MouseEventArgs e)
+        //
+        private void UpdatePlaylistTitleDisplay()
         {
-            if (e.Button == MouseButtons.Right)
+            if (currentPlaylist != null)
             {
-                // Select the track under the cursor
-                CustomPlaylistPanel panel = (CustomPlaylistPanel)sender;
-                foreach (Control control in panel.Controls)
-                {
-                    if (control is CustomTrackItem && control.Bounds.Contains(e.Location))
-                    {
-                        // Ensure the track is selected before showing context menu
-                        CustomTrackItem item = (CustomTrackItem)control;
+                // Show the current playlist name and track count
+                int trackCount = currentPlaylist.Tracks.Count;
+                string trackText = trackCount == 1 ? "track" : "tracks"; // Proper pluralization
 
-                        // Force selection on right-click
-                        item.SetPlaying(true); // Visual feedback
-
-                        // Show different context menu based on which panel was clicked
-                        if (panel == customPlaylistPanel)
-                        {
-                            menuPlaylist.Show(panel, e.Location);
-                        }
-                        else
-                        {
-                            menuSavedPlaylists.Show(panel, e.Location);
-                        }
-                        break;
-                    }
-                }
+                lblCurrentPlaylist.Text = $"Playlist Name: {currentPlaylist.Name} ({trackCount} {trackText})";
+            }
+            else
+            {
+                // No playlist loaded
+                lblCurrentPlaylist.Text = "";
             }
         }
 

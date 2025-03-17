@@ -233,6 +233,16 @@ namespace CuteMediaPlayer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap playingAnimationSprite {
+            get {
+                object obj = ResourceManager.GetObject("playingAnimationSprite", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap PlaylistIcon {
             get {
                 object obj = ResourceManager.GetObject("PlaylistIcon", resourceCulture);

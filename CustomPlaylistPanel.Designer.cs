@@ -34,9 +34,8 @@
             // 
             // listEmptyLabel
             // 
-            listEmptyLabel.Dock = DockStyle.Top;
             listEmptyLabel.Font = new Font("MS PGothic", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            listEmptyLabel.Location = new Point(0, 0);
+            listEmptyLabel.Location = new Point(0, 23);
             listEmptyLabel.Name = "listEmptyLabel";
             listEmptyLabel.Size = new Size(332, 38);
             listEmptyLabel.TabIndex = 0;
@@ -45,11 +44,11 @@
             // 
             // btnAddSongs
             // 
-            btnAddSongs.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            btnAddSongs.Anchor = AnchorStyles.Top;
             btnAddSongs.BackColor = Color.FromArgb(255, 192, 192);
             btnAddSongs.Cursor = Cursors.Hand;
             btnAddSongs.Font = new Font("MS PGothic", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            btnAddSongs.Location = new Point(91, 56);
+            btnAddSongs.Location = new Point(90, 78);
             btnAddSongs.Margin = new Padding(3, 4, 3, 4);
             btnAddSongs.Name = "btnAddSongs";
             btnAddSongs.Size = new Size(126, 36);

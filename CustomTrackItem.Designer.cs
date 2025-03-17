@@ -20,7 +20,6 @@
             pictureAlbumArt = new PictureBox();
             lblTitle = new Label();
             lblArtist = new Label();
-            lblPlayingIndicator = new Label();
             lblDuration = new Label();
             ((System.ComponentModel.ISupportInitialize)pictureAlbumArt).BeginInit();
             SuspendLayout();
@@ -56,17 +55,6 @@
             lblArtist.TabIndex = 2;
             lblArtist.Text = "Artist";
             // 
-            // lblPlayingIndicator
-            // 
-            lblPlayingIndicator.Font = new Font("Wingdings", 12F);
-            lblPlayingIndicator.ForeColor = Color.DarkMagenta;
-            lblPlayingIndicator.Location = new Point(315, 20);
-            lblPlayingIndicator.Name = "lblPlayingIndicator";
-            lblPlayingIndicator.Size = new Size(32, 28);
-            lblPlayingIndicator.TabIndex = 3;
-            lblPlayingIndicator.Text = "►";
-            lblPlayingIndicator.Visible = false;
-            // 
             // lblDuration
             // 
             lblDuration.AutoSize = true;
@@ -84,7 +72,6 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(254, 218, 224);
             Controls.Add(lblDuration);
-            Controls.Add(lblPlayingIndicator);
             Controls.Add(lblArtist);
             Controls.Add(lblTitle);
             Controls.Add(pictureAlbumArt);
@@ -101,7 +88,6 @@
         private PictureBox pictureAlbumArt;
         private Label lblTitle;
         private Label lblArtist;
-        private Label lblPlayingIndicator;
         private Label lblDuration;
     }
 }
