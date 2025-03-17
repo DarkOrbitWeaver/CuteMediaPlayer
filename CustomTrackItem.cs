@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using Timer = System.Windows.Forms.Timer;
 
 namespace CuteMediaPlayer
@@ -83,9 +84,14 @@ namespace CuteMediaPlayer
                 trackMenu.Items.Add(deletePlaylistItem);
 
                 // Extract clean playlist name
-                this.Title = filePath.Replace("PLAYLIST:", "").Trim();
+                string playlistInfo = filePath.Replace("PLAYLIST:", "").Trim();
+                string[] parts = playlistInfo.Split('|');  // Split into name and count
+                this.Title = parts[0];  // Get playlist name from first part
+
                 this.Artist = "Playlist";
-                Debug.WriteLine($"Setting playlist item: {this.Title}");
+
+                int trackCount = parts.Length > 1 ? int.Parse(parts[1]) : 0;  // Get track count
+                this.Artist = $"Playlist - (tracks: {trackCount})";  // Set artist label
 
                 // Update UI
                 lblTitle.Text = this.Title;
@@ -101,6 +107,16 @@ namespace CuteMediaPlayer
                 {
                     pictureAlbumArt.Image = Properties.Resources.MusicPlaceholderIcon;
                 }
+
+                if (trackCount == 0)
+                {
+                    lblTitle.ForeColor = Color.Gray;
+                    lblArtist.ForeColor = Color.Gray;
+                    toolTip1.SetToolTip(this, "Empty playlist - Right-click to delete");
+                    pictureAlbumArt.Image = Properties.Resources.DisabledSavedPlaylistIcon;
+                    this.Cursor = Cursors.Arrow;
+                }
+
                 return;
             }
             else

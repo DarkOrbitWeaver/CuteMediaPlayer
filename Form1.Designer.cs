@@ -75,6 +75,7 @@
             currentPlaylistLabelContainer = new Panel();
             lblCurrentPlaylist = new Label();
             currentPlayingButtonContainer = new Panel();
+            AddSongsToCurrentPlaylist = new Button();
             openMinimizedPlayer = new Button();
             btnAddToPlaylist = new Button();
             panel3 = new Panel();
@@ -268,6 +269,7 @@
             // 
             // currentPlayingButtonContainer
             // 
+            currentPlayingButtonContainer.Controls.Add(AddSongsToCurrentPlaylist);
             currentPlayingButtonContainer.Controls.Add(openMinimizedPlayer);
             currentPlayingButtonContainer.Controls.Add(btnAddToPlaylist);
             currentPlayingButtonContainer.Dock = DockStyle.Bottom;
@@ -276,12 +278,27 @@
             currentPlayingButtonContainer.Size = new Size(353, 43);
             currentPlayingButtonContainer.TabIndex = 1;
             // 
+            // AddSongsToCurrentPlaylist
+            // 
+            AddSongsToCurrentPlaylist.BackColor = Color.FromArgb(255, 192, 192);
+            AddSongsToCurrentPlaylist.Cursor = Cursors.Hand;
+            AddSongsToCurrentPlaylist.Enabled = false;
+            AddSongsToCurrentPlaylist.Font = new Font("MS PGothic", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            AddSongsToCurrentPlaylist.Location = new Point(11, 4);
+            AddSongsToCurrentPlaylist.Margin = new Padding(3, 4, 3, 4);
+            AddSongsToCurrentPlaylist.Name = "AddSongsToCurrentPlaylist";
+            AddSongsToCurrentPlaylist.Size = new Size(50, 36);
+            AddSongsToCurrentPlaylist.TabIndex = 3;
+            AddSongsToCurrentPlaylist.Text = "Add";
+            AddSongsToCurrentPlaylist.UseVisualStyleBackColor = false;
+            AddSongsToCurrentPlaylist.Click += AddSongsToCurrentPlaylist_Click;
+            // 
             // openMinimizedPlayer
             // 
             openMinimizedPlayer.BackColor = Color.FromArgb(255, 192, 192);
             openMinimizedPlayer.Cursor = Cursors.Hand;
             openMinimizedPlayer.Font = new Font("MS PGothic", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            openMinimizedPlayer.Location = new Point(184, 4);
+            openMinimizedPlayer.Location = new Point(208, 4);
             openMinimizedPlayer.Margin = new Padding(3, 4, 3, 4);
             openMinimizedPlayer.Name = "openMinimizedPlayer";
             openMinimizedPlayer.Size = new Size(134, 36);
@@ -295,7 +312,7 @@
             btnAddToPlaylist.BackColor = Color.FromArgb(255, 192, 192);
             btnAddToPlaylist.Cursor = Cursors.Hand;
             btnAddToPlaylist.Font = new Font("MS PGothic", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            btnAddToPlaylist.Location = new Point(43, 4);
+            btnAddToPlaylist.Location = new Point(67, 4);
             btnAddToPlaylist.Margin = new Padding(3, 4, 3, 4);
             btnAddToPlaylist.Name = "btnAddToPlaylist";
             btnAddToPlaylist.Size = new Size(135, 36);
@@ -430,6 +447,7 @@
             btnAddCurrentToPlaylist.TabIndex = 11;
             AddToPlaylistTooltip.SetToolTip(btnAddCurrentToPlaylist, "Add To Playlist");
             btnAddCurrentToPlaylist.UseVisualStyleBackColor = true;
+            btnAddCurrentToPlaylist.Click += btnAddCurrentToPlaylist_Click;
             // 
             // shuffle
             // 
@@ -754,5 +772,6 @@
         private Panel panel3;
         private Panel currentPlaylistLabelContainer;
         private Label lblCurrentPlaylist;
+        private Button AddSongsToCurrentPlaylist;
     }
 }

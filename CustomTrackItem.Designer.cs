@@ -17,10 +17,12 @@
 
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             pictureAlbumArt = new PictureBox();
             lblTitle = new Label();
             lblArtist = new Label();
             lblDuration = new Label();
+            toolTip1 = new ToolTip(components);
             ((System.ComponentModel.ISupportInitialize)pictureAlbumArt).BeginInit();
             SuspendLayout();
             // 
@@ -89,5 +91,6 @@
         private Label lblTitle;
         private Label lblArtist;
         private Label lblDuration;
+        private ToolTip toolTip1;
     }
 }

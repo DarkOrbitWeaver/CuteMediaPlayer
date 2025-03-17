@@ -72,6 +72,7 @@ namespace CuteMediaPlayer
 
         private void LoadAllPlaylists()
         {
+            bool wasUsingDefault = (currentPlaylist.Name == "Default");
             allPlaylists.Clear();
             Directory.CreateDirectory(playlistsFolder);
 
@@ -99,7 +100,13 @@ namespace CuteMediaPlayer
             customPlaylistsPanel.ClearTracks();
             foreach (var playlist in allPlaylists)
             {
-                customPlaylistsPanel.AddTrack($"PLAYLIST:{playlist.Name}");
+                customPlaylistsPanel.AddTrack($"PLAYLIST:{playlist.Name}|{playlist.Tracks.Count}");
+            }
+
+            if (wasUsingDefault)
+            {
+                currentPlaylist = allPlaylists.FirstOrDefault(p => p.Name == "Default")
+                                ?? new Playlist { Name = "Default" };
             }
         }
 
@@ -125,6 +132,8 @@ namespace CuteMediaPlayer
                     // Empty name check
                     if (string.IsNullOrWhiteSpace(baseName))
                     {
+                        baseName = "My Playlist";
+                        finalName = baseName;
                         MessageBox.Show("Playlist name cannot be empty!");
                         continue;
                     }
@@ -268,6 +277,12 @@ namespace CuteMediaPlayer
         {
             try
             {
+
+                if (currentPlaylist == null)
+                {
+                    currentPlaylist = new Playlist { Name = "Default" };
+                }
+
                 // Update custom playlist panel
                 customPlaylistPanel.SetTracks(currentPlaylist.Tracks);
 
@@ -316,7 +331,37 @@ namespace CuteMediaPlayer
             MessageBox.Show($"Added to '{target.Name}'! (¬_¬\")");
         }
 
+        //
+        private void btnAddCurrentToPlaylist_Click(object sender, EventArgs e)
+        {
+            // Check if any track is playing
+            if (currentTrackIndex == -1 || playlist.Count == 0)
+            {
+                MessageBox.Show("No track is playing!");
+                return;
+            }
 
+            // Get current track
+            string currentFile = playlist[currentTrackIndex];
+
+            // Select target playlist
+            Playlist target = SelectPlaylistDialog();
+            if (target == null) return;
+
+            // Check if already exists
+            if (!target.Tracks.Contains(currentFile))
+            {
+                // Add to existing tracks 
+                target.Tracks.Add(currentFile);
+                SaveAllPlaylists();
+                LoadAllPlaylists();
+                MessageBox.Show("Added current song to playlist!");
+            }
+            else
+            {
+                MessageBox.Show("Song already exists in this playlist!");
+            }
+        }
 
         // ui
         private void InitializeCustomPlaylistControls()
@@ -358,20 +403,26 @@ namespace CuteMediaPlayer
                     try
                     {
                         int index = allPlaylists.FindIndex(p => string.Equals(p.Name, item.Title, StringComparison.OrdinalIgnoreCase));
+
+                        if (index != -1 && allPlaylists[index].Name == currentPlaylist.Name)
+                        {
+                            // Reset current playlist if deleting active one
+                            currentPlaylist = new Playlist { Name = "Default" };
+                            playlist = currentPlaylist.Tracks;
+                            currentTrackIndex = -1; // Reset selection
+                        }
+
                         if (index != -1)
                         {
                             string playlistPath = Path.Combine(playlistsFolder, $"{allPlaylists[index].Name}.m3u");
                             if (File.Exists(playlistPath))
                             {
                                 File.Delete(playlistPath); // 🗑️ Delete the file
-                                Debug.WriteLine("deleted the file?");
                             }
-                            Debug.WriteLine("here at " + index);
                             allPlaylists.RemoveAt(index); // Remove from list
 
-                            // 🔥 NEW: Force-refresh the playlists panel
+                            // Force-refresh the playlists panel
                             customPlaylistsPanel.ClearTracks();
-                            Debug.WriteLine("here at this cleartracks shit");
 
                             foreach (var pl in allPlaylists)
                             {
@@ -379,8 +430,11 @@ namespace CuteMediaPlayer
                             }
 
                             customPlaylistsPanel.Refresh(); // ⚡ Force UI update
-                            Debug.WriteLine("FORCE MY RRRR");
                             SaveAllPlaylists();
+                            LoadAllPlaylists(); // Reload all playlists properly
+                            SyncPlaylistToUI();
+                            UpdateButtonStates();
+                            UpdateButtonImages();
                         }
                     }
                     catch (Exception ex)

@@ -1,6 +1,7 @@
 ﻿using Vlc.DotNet.Forms;
 using Vlc.DotNet.Core; // Required for VlcTrackType
 using Timer = System.Windows.Forms.Timer;
+using Microsoft.Win32;
 
 
 namespace CuteMediaPlayer
@@ -16,7 +17,7 @@ namespace CuteMediaPlayer
         private int lastVolumeBarValue = 100;
 
         // filter files (when opening exploerer to select media)
-        string FilesFilter = "Media Files|*.mp4;*.mp3;*.avi;*.mkv;*.wav;*.m4a;*.aac;*.flac;*.ogg;*.wma";
+        public static string FilesFilter = "Media Files|*.mp4;*.mp3;*.avi;*.mkv;*.wav;*.m4a;*.aac;*.flac;*.ogg;*.wma";
 
         private Timer uiTimer;
 
@@ -159,7 +160,7 @@ namespace CuteMediaPlayer
             OpenToolStripMenuItemHelper();
         }
 
-        private void OpenToolStripMenuItemHelper()
+        private void OpenToolStripMenuItemHelper(bool appendToCurrentPlaylist = false)
         {
             using OpenFileDialog dialog = new OpenFileDialog();
             dialog.Filter = FilesFilter;
@@ -171,7 +172,12 @@ namespace CuteMediaPlayer
                 var validFiles = dialog.FileNames.Where(f => File.Exists(f)).ToArray();
 
                 // 🎵 Create NEW temporary playlist
-                currentPlaylist = new Playlist { Name = $"Temporary_{DateTime.Now:yyyyMMdd_HHmmss}" };
+                // ONLY CREATE NEW PLAYLIST IF WE'RE NOT APPENDING
+                if (!appendToCurrentPlaylist)
+                {
+                    currentPlaylist = new Playlist { Name = $"Temporary_{DateTime.Now:yyyyMMdd_HHmmss}" };
+                }
+
                 foreach (string file in validFiles)
                 {
                     currentPlaylist.Tracks.Add(file);
@@ -183,7 +189,8 @@ namespace CuteMediaPlayer
 
                 // ⭐ STOP OLD PLAYBACK + START NEW
                 if (mediaPlayer.IsPlaying) mediaPlayer.Stop();
-                PlayCurrentTrack(); // ⭐ THIS IS THE KEY FIX
+                PlayCurrentTrack();
+
 
                 UpdateFileType();
                 UpdateWindowTitle();
@@ -240,6 +247,7 @@ namespace CuteMediaPlayer
             try
             {
                 bool mediaLoaded = currentTrackIndex >= 0 && playlist.Count > 0;
+                AddSongsToCurrentPlaylist.Enabled = mediaLoaded;
                 btnPlayPause.Enabled = mediaLoaded;
                 UpdateButtonImages();
                 btnStop.Enabled = mediaLoaded;
@@ -471,7 +479,8 @@ namespace CuteMediaPlayer
             minimizedPlayer.BringToFront(); // Make sure it's visible on top
 
             // When minimized player closes, restore the main form
-            minimizedPlayer.FormClosed += (s, args) => {
+            minimizedPlayer.FormClosed += (s, args) =>
+            {
                 this.WindowState = FormWindowState.Normal;
                 this.Activate(); // Bring the main form to the front
             };
@@ -482,5 +491,65 @@ namespace CuteMediaPlayer
         {
             ButtonStatesChanged?.Invoke(this, EventArgs.Empty);
         }
+
+        private void AddSongsToCurrentPlaylist_Click(object sender, EventArgs e)
+        {
+            OpenToolStripMenuItemHelper(true);
+        }
+
+        //  when someone open fiels via right click
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            // 📂 If launched with files from context menu
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Length > 1)
+            {
+                // 🎵 Create temporary playlist (like Open method)
+                currentPlaylist = new Playlist { Name = $"Temporary_{DateTime.Now:yyyyMMdd_HHmmss}" };
+
+                // ➕ Add valid files
+                var validFiles = args.Skip(1).Where(f => File.Exists(f)).ToArray();
+                foreach (string file in validFiles)
+                {
+                    currentPlaylist.Tracks.Add(file);
+                }
+
+                if (currentPlaylist.Tracks.Count > 0)
+                {
+                    // 🔄 Sync playlist reference (IMPORTANT!)
+                    playlist = currentPlaylist.Tracks;
+                    currentTrackIndex = 0;
+
+                    // ⭐ Stop any existing playback
+                    if (mediaPlayer.IsPlaying) mediaPlayer.Stop();
+
+                    // 🔄 Update critical UI elements FIRST
+                    UpdateFileType();
+                    UpdateWindowTitle();
+
+                    // 📋 Refresh playlist panel
+                    customPlaylistPanel.ClearTracks();
+                    currentPlaylist.Tracks.ForEach(t => customPlaylistPanel.AddTrack(t));
+
+                    // ▶️ Start playback AFTER UI updates
+                    PlayCurrentTrack();
+
+                    // 🔄 Force full UI refresh
+                    UpdateButtonStates();
+                    UpdateButtonImages();
+
+                    // 🔍 Ensure track is highlighted
+                    customPlaylistPanel.SelectTrack(currentTrackIndex);
+                }
+                else
+                {
+                    MessageBox.Show("No valid files were found in the selection");
+                }
+            }
+        }
+
+ 
     }
 }
