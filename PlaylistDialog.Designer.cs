@@ -3,28 +3,25 @@
     partial class PlaylistDialog
     {
         private System.ComponentModel.IContainer components = null;
-        private ListBox listPlaylists;
         private Button btnOK;
         private Button btnCancel;
+        private Label label1;
 
         private void InitializeComponent()
         {
-            listPlaylists = new ListBox();
             btnOK = new Button();
             btnCancel = new Button();
             label1 = new Label();
             SuspendLayout();
-            // 
-            // listPlaylists
-            // 
-            listPlaylists.Font = new Font("MS PGothic", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            listPlaylists.FormattingEnabled = true;
-            listPlaylists.Location = new Point(12, 54);
-            listPlaylists.Margin = new Padding(3, 4, 3, 4);
-            listPlaylists.Name = "listPlaylists";
-            listPlaylists.ScrollAlwaysVisible = true;
-            listPlaylists.Size = new Size(347, 244);
-            listPlaylists.TabIndex = 0;
+
+            // Create the CustomPlaylistPanel
+            playlistPanel = new CustomPlaylistPanel();
+            playlistPanel.Location = new Point(12, 54);
+            playlistPanel.Size = new Size(347, 244);
+            playlistPanel.AutoScroll = true;
+            playlistPanel.Name = "playlistPanel";
+            playlistPanel.TabIndex = 0;
+
             // 
             // btnOK
             // 
@@ -35,6 +32,7 @@
             btnOK.Size = new Size(96, 42);
             btnOK.TabIndex = 1;
             btnOK.Text = "OK";
+
             // 
             // btnCancel
             // 
@@ -45,6 +43,7 @@
             btnCancel.Size = new Size(93, 42);
             btnCancel.TabIndex = 2;
             btnCancel.Text = "Cancel";
+
             // 
             // label1
             // 
@@ -53,7 +52,8 @@
             label1.Name = "label1";
             label1.Size = new Size(347, 41);
             label1.TabIndex = 3;
-            label1.Text = "This will add all \"Now Playing\"  to the selected playlist";
+            label1.Text = "Select a playlist";
+
             // 
             // PlaylistDialog
             // 
@@ -64,7 +64,7 @@
             Controls.Add(label1);
             Controls.Add(btnCancel);
             Controls.Add(btnOK);
-            Controls.Add(listPlaylists);
+            Controls.Add(playlistPanel);
             Font = new Font("MS PGothic", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
             FormBorderStyle = FormBorderStyle.None;
             Margin = new Padding(4, 2, 4, 2);
@@ -72,9 +72,6 @@
             StartPosition = FormStartPosition.CenterParent;
             Text = "Select Playlist";
             ResumeLayout(false);
-
-
         }
-        private Label label1;
     }
 }

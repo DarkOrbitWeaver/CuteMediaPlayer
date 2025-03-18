@@ -14,7 +14,7 @@ namespace CuteMediaPlayer
     public partial class MinimizedPlayer : Form
     {
         private Form1 mainForm;
-
+        private bool positionInitialized = false;
         public MinimizedPlayer(Form1 mainForm)
         {
             InitializeComponent();
@@ -43,6 +43,7 @@ namespace CuteMediaPlayer
 
             // Unsubscribe when form closes to prevent memory leaks
             this.FormClosed += (s, e) => mainForm.ButtonStatesChanged -= (s2, e2) => SyncButtonStates();
+            this.FormClosed += (s, e) => this.Dispose();
         }
 
         // Update button states and images based on main form
@@ -62,6 +63,33 @@ namespace CuteMediaPlayer
         private void closeMinimizerPlayer_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            // Load saved position
+            if (Properties.Settings.Default.MinimizedPlayerLocation != Point.Empty)
+            {
+                this.Location = Properties.Settings.Default.MinimizedPlayerLocation;
+            }
+            positionInitialized = true;
+            base.OnLoad(e);
+        }
+
+        protected override void OnMove(EventArgs e)
+        {
+            if (positionInitialized && WindowState == FormWindowState.Normal)
+            {
+                Properties.Settings.Default.MinimizedPlayerLocation = this.Location;
+            }
+            base.OnMove(e);
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            Properties.Settings.Default.MinimizedPlayerClosed = true;
+            Properties.Settings.Default.Save();
+            base.OnFormClosing(e);
         }
     }
 }

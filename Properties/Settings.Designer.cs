@@ -34,5 +34,29 @@ namespace CuteMediaPlayer.Properties {
                 this["LastVolume"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0, 0")]
+        public global::System.Drawing.Point MinimizedPlayerLocation {
+            get {
+                return ((global::System.Drawing.Point)(this["MinimizedPlayerLocation"]));
+            }
+            set {
+                this["MinimizedPlayerLocation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool MinimizedPlayerClosed {
+            get {
+                return ((bool)(this["MinimizedPlayerClosed"]));
+            }
+            set {
+                this["MinimizedPlayerClosed"] = value;
+            }
+        }
     }
 }

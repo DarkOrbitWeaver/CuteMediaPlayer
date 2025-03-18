@@ -26,7 +26,7 @@ namespace CuteMediaPlayer
             public List<string> Tracks { get; set; } = new List<string>();
         }
 
-        private Playlist SelectPlaylistDialog()
+        private Playlist SelectPlaylistDialog(string promptText = "")
         {
             // No playlists exist
             if (allPlaylists.Count == 0)
@@ -35,23 +35,27 @@ namespace CuteMediaPlayer
                 return null;
             }
 
-            using (PlaylistDialog dialog = new PlaylistDialog())
+            using (PlaylistDialog dialog = new PlaylistDialog(promptText))
             {
-                // Add playlist names to listbox
-                dialog.PlaylistListBox.Items.AddRange(allPlaylists.Select(p => p.Name).ToArray());
+                // Pass the entire playlists collection instead of just names
+                dialog.PopulatePlaylists(allPlaylists);
 
                 // Show the dialog
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    //  Check if user actually selected something
-                    if (dialog.PlaylistListBox.SelectedIndex == -1)
+                    // Get the selected playlist
+                    string selectedName = dialog.SelectedPlaylist;
+
+                    // Find the corresponding playlist
+                    if (!string.IsNullOrEmpty(selectedName))
+                    {
+                        return allPlaylists.FirstOrDefault(p => p.Name == selectedName);
+                    }
+                    else
                     {
                         MessageBox.Show("Please select a playlist first!");
                         return null;
                     }
-
-                    // Return safe selected playlist
-                    return allPlaylists[dialog.PlaylistListBox.SelectedIndex];
                 }
             }
             return null;
@@ -314,7 +318,7 @@ namespace CuteMediaPlayer
             }
 
             // Let user choose a target playlist
-            Playlist target = SelectPlaylistDialog();
+            Playlist target = SelectPlaylistDialog("This will add all \"Now Playing\"  to the selected playlist");
             if (target == null) return; // User canceled
 
             // Add each track from current playlist to target (skip duplicates)
@@ -345,7 +349,7 @@ namespace CuteMediaPlayer
             string currentFile = playlist[currentTrackIndex];
 
             // Select target playlist
-            Playlist target = SelectPlaylistDialog();
+            Playlist target = SelectPlaylistDialog("Add Currently playing track to a playlist:");
             if (target == null) return;
 
             // Check if already exists

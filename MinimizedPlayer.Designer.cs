@@ -111,7 +111,6 @@ namespace CuteMediaPlayer
             FormBorderStyle = FormBorderStyle.None;
             Margin = new Padding(4, 2, 4, 2);
             Name = "MinimizedPlayer";
-            StartPosition = FormStartPosition.CenterParent;
             Text = "HelpForm";
             ResumeLayout(false);
         }

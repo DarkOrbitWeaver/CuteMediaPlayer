@@ -8,7 +8,7 @@ namespace CuteMediaPlayer
             InitializeComponent();
 
             // Apply rounded styling
-            FormStyling.ApplyRoundedStyle(this);
+            FormStyling.ApplyRoundedStyle(this, borderColor: Color.FromArgb(254, 184, 195), backgroundColor: Color.FromArgb(255, 240, 250));
 
             // Make specific controls draggable - NOT the button
             FormStyling.MakeDraggable(this, this); // The form itself

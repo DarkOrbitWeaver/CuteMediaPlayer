@@ -2,6 +2,7 @@
 using Vlc.DotNet.Core; // Required for VlcTrackType
 using Timer = System.Windows.Forms.Timer;
 using Microsoft.Win32;
+using System.Diagnostics;
 
 
 namespace CuteMediaPlayer
@@ -42,6 +43,9 @@ namespace CuteMediaPlayer
 
         // Event that fires when button states change
         public event EventHandler ButtonStatesChanged;
+
+        // minimzed player
+        private MinimizedPlayer activeMinimizedPlayer = null;
 
         public Form1()
         {
@@ -347,6 +351,11 @@ namespace CuteMediaPlayer
                 {
                     mediaPlayer.Audio.Volume = volumeBar.Value;
                 }
+
+                if (!Properties.Settings.Default.MinimizedPlayerClosed && Properties.Settings.Default.MinimizedPlayerLocation != Point.Empty)
+                {
+                    openMinimizedPlayer_Click(null, EventArgs.Empty);
+                }
             }
             catch (Exception ex)
             {
@@ -366,6 +375,20 @@ namespace CuteMediaPlayer
             {
                 Console.WriteLine($"Error saving settings: {ex.Message}");
             }
+        }
+
+        // preserver location in settings
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+
+            // Save minimized player status
+            if (activeMinimizedPlayer != null && !activeMinimizedPlayer.IsDisposed)
+            {
+                Properties.Settings.Default.MinimizedPlayerClosed = false;
+                activeMinimizedPlayer.Close();
+            }
+
+            Properties.Settings.Default.Save();
         }
 
         private void DisposeOfDancingGirlFrames()
@@ -465,25 +488,33 @@ namespace CuteMediaPlayer
         // to open minimized player
         private void openMinimizedPlayer_Click(object sender, EventArgs e)
         {
-            // Create the minimized player
-            MinimizedPlayer minimizedPlayer = new MinimizedPlayer(this);
-
-            // Minimize the main form
-            this.WindowState = FormWindowState.Minimized;
-
-            // Make sure the minimized player appears properly
-            minimizedPlayer.WindowState = FormWindowState.Normal;
-            minimizedPlayer.StartPosition = FormStartPosition.CenterScreen;
-            minimizedPlayer.Show();
-            minimizedPlayer.Activate(); // Force focus to the new form
-            minimizedPlayer.BringToFront(); // Make sure it's visible on top
-
-            // When minimized player closes, restore the main form
-            minimizedPlayer.FormClosed += (s, args) =>
+            if (activeMinimizedPlayer == null || activeMinimizedPlayer.IsDisposed)
             {
-                this.WindowState = FormWindowState.Normal;
-                this.Activate(); // Bring the main form to the front
-            };
+                activeMinimizedPlayer = new MinimizedPlayer(this);
+                activeMinimizedPlayer.FormClosed += (s, _) =>
+                {
+                    this.WindowState = FormWindowState.Normal;
+                    this.Activate();
+                    activeMinimizedPlayer = null;
+                    Properties.Settings.Default.MinimizedPlayerClosed = true;
+                    Properties.Settings.Default.Save();
+                };
+
+                // Restore previous position if exists
+                if (Properties.Settings.Default.MinimizedPlayerLocation != Point.Empty)
+                {
+                    activeMinimizedPlayer.Location = Properties.Settings.Default.MinimizedPlayerLocation;
+                }
+
+                this.WindowState = FormWindowState.Minimized;
+                activeMinimizedPlayer.Show();
+                Properties.Settings.Default.MinimizedPlayerClosed = false;
+            }
+            else
+            {
+                activeMinimizedPlayer.Activate();
+                activeMinimizedPlayer.WindowState = FormWindowState.Normal;
+            }
         }
 
         //  whenever your button states change
@@ -500,54 +531,66 @@ namespace CuteMediaPlayer
         //  when someone open fiels via right click
         protected override void OnLoad(EventArgs e)
         {
-            base.OnLoad(e);
 
-            // 📂 If launched with files from context menu
-            string[] args = Environment.GetCommandLineArgs();
-            if (args.Length > 1)
+            try
             {
-                // 🎵 Create temporary playlist (like Open method)
-                currentPlaylist = new Playlist { Name = $"Temporary_{DateTime.Now:yyyyMMdd_HHmmss}" };
+                base.OnLoad(e);
 
-                // ➕ Add valid files
-                var validFiles = args.Skip(1).Where(f => File.Exists(f)).ToArray();
-                foreach (string file in validFiles)
+                // 📂 If launched with files from context menu
+                string[] args = Environment.GetCommandLineArgs();
+                if (args.Length > 1)
                 {
-                    currentPlaylist.Tracks.Add(file);
+                    // 🎵 Create temporary playlist (like Open method)
+                    currentPlaylist = new Playlist { Name = $"Temporary_{DateTime.Now:yyyyMMdd_HHmmss}" };
+
+                    // ➕ Add valid files
+                    var validFiles = args.Skip(1).Where(f => File.Exists(f)).ToArray();
+                    foreach (string file in validFiles)
+                    {
+                        currentPlaylist.Tracks.Add(file);
+                    }
+
+                    if (currentPlaylist.Tracks.Count > 0)
+                    {
+                        // 🔄 Sync playlist reference (IMPORTANT!)
+                        playlist = currentPlaylist.Tracks;
+                        currentTrackIndex = 0;
+
+                        // ⭐ Stop any existing playback
+                        if (mediaPlayer.IsPlaying) mediaPlayer.Stop();
+
+                        // 🔄 Update critical UI elements FIRST
+                        UpdateFileType();
+                        UpdateWindowTitle();
+
+                        // 📋 Refresh playlist panel
+                        customPlaylistPanel.ClearTracks();
+                        currentPlaylist.Tracks.ForEach(t => customPlaylistPanel.AddTrack(t));
+
+                        // ▶️ Start playback AFTER UI updates
+                        PlayCurrentTrack();
+
+                        // 🔄 Force full UI refresh
+                        UpdateButtonStates();
+                        UpdateButtonImages();
+
+                        // 🔍 Ensure track is highlighted
+                        customPlaylistPanel.SelectTrack(currentTrackIndex);
+                    }
+                    else
+                    {
+                        MessageBox.Show("No valid files were found in the selection");
+                    }
                 }
 
-                if (currentPlaylist.Tracks.Count > 0)
-                {
-                    // 🔄 Sync playlist reference (IMPORTANT!)
-                    playlist = currentPlaylist.Tracks;
-                    currentTrackIndex = 0;
-
-                    // ⭐ Stop any existing playback
-                    if (mediaPlayer.IsPlaying) mediaPlayer.Stop();
-
-                    // 🔄 Update critical UI elements FIRST
-                    UpdateFileType();
-                    UpdateWindowTitle();
-
-                    // 📋 Refresh playlist panel
-                    customPlaylistPanel.ClearTracks();
-                    currentPlaylist.Tracks.ForEach(t => customPlaylistPanel.AddTrack(t));
-
-                    // ▶️ Start playback AFTER UI updates
-                    PlayCurrentTrack();
-
-                    // 🔄 Force full UI refresh
-                    UpdateButtonStates();
-                    UpdateButtonImages();
-
-                    // 🔍 Ensure track is highlighted
-                    customPlaylistPanel.SelectTrack(currentTrackIndex);
-                }
-                else
-                {
-                    MessageBox.Show("No valid files were found in the selection");
-                }
+        
             }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error saving settings: {ex.Message}");
+            }
+
+
         }
 
  

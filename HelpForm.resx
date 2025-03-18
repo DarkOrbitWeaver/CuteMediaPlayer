@@ -117,4 +117,33 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="label1.Text" xml:space="preserve">
+    <value>Hey, well heey :O
+---------------------
+How to use?
+
+1. Create a playlist &gt; 
+ - click the stars icon (3 starts next to loop button) 
+- go to "My Playlists" tab, create a new playlist.
+
+2. there is 3 buttons in "Now playing" tab
+ - "Open Files" &gt; adds new files 
+- "Save Songs" &gt; select a playlist&gt; done. 
+- now you can access the playlist via the "My Playlist"Tab. 
+feel free to create as many as you want
+- "Add" lets you add new songs temporarily to an 
+opened playlist (make sure to save them via "Save Songs")
+- "Minimized" lets you listen to tracks while using other apps.
+
+3- Add currently playing song to a selected playlist (Star button next to Playlist button)
+
+4- theme changer button (changes the waves color)
+
+5-shuffle button (next to the theme changer button)
+
+---------------------
+
+if you have any idea please tell me 
+ill be happy to try them(●'◡'●)</value>
+  </data>
 </root>

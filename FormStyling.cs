@@ -11,14 +11,14 @@ namespace CuteMediaPlayer
         private static Form currentlyDraggingForm = null;
 
         // Apply rounded corners and styling (unchanged)
-        public static void ApplyRoundedStyle(Form form, int cornerRadius = 20, Color? borderColor = null, int borderWidth = 3)
+        public static void ApplyRoundedStyle(Form form, int cornerRadius = 20, Color? borderColor = null, Color? backgroundColor = null, int borderWidth = 3)
         {
             // Default styling
             Color actualBorderColor = borderColor ?? Color.HotPink;
 
             // Setup form
             form.FormBorderStyle = FormBorderStyle.None;
-            form.BackColor = Color.FromArgb(254, 184, 195); // Your standard pink background
+            form.BackColor = backgroundColor ?? Color.FromArgb(254, 184, 195); // standard pink background 255, 240, 250
 
             // Enable double buffering for smooth painting
             typeof(Control).GetProperty("DoubleBuffered",
