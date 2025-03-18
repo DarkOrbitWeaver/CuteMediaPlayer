@@ -211,6 +211,7 @@ namespace CuteMediaPlayer
             // Make sure it's in front
             sparkleVisualizer1.BringToFront();
             dancingGirlPictureBox.BringToFront();
+            UpdateVisualizerVisibility();
         }
 
 

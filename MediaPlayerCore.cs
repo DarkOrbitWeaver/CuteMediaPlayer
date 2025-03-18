@@ -100,7 +100,7 @@ namespace CuteMediaPlayer
                                     // switch the position of dancing girl
                                     if (random.Next(3) == 2)
                                     {
-                                        dancingGirlPictureBox.Location = new Point(630, 356);
+                                        dancingGirlPictureBox.Location = new Point(551, 356);
                                         dancingGirlPictureBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
                                     }else
                                     {

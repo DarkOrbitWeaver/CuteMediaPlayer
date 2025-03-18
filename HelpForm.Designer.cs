@@ -35,7 +35,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(170, 633);
+            button1.Location = new Point(175, 667);
             button1.Margin = new Padding(4, 2, 4, 2);
             button1.Name = "button1";
             button1.Size = new Size(134, 46);
@@ -50,7 +50,7 @@
             label1.Location = new Point(13, 10);
             label1.Margin = new Padding(4, 0, 4, 0);
             label1.Name = "label1";
-            label1.Size = new Size(464, 621);
+            label1.Size = new Size(476, 655);
             label1.TabIndex = 1;
             label1.Text = resources.GetString("label1.Text");
             // 
@@ -59,7 +59,7 @@
             AutoScaleDimensions = new SizeF(9F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(255, 240, 250);
-            ClientSize = new Size(502, 690);
+            ClientSize = new Size(502, 724);
             Controls.Add(label1);
             Controls.Add(button1);
             Font = new Font("MS PGothic", 12.75F, FontStyle.Regular, GraphicsUnit.Point, 0);

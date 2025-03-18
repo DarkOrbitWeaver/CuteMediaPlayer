@@ -251,6 +251,7 @@ namespace CuteMediaPlayer
             try
             {
                 bool mediaLoaded = currentTrackIndex >= 0 && playlist.Count > 0;
+                btnAddToPlaylist.Enabled = mediaLoaded;
                 AddSongsToCurrentPlaylist.Enabled = mediaLoaded;
                 btnPlayPause.Enabled = mediaLoaded;
                 UpdateButtonImages();

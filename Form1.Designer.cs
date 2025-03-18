@@ -169,7 +169,7 @@
             // aboutToolStripMenuItem
             // 
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            aboutToolStripMenuItem.Size = new Size(180, 22);
+            aboutToolStripMenuItem.Size = new Size(139, 22);
             aboutToolStripMenuItem.Text = "How to use?";
             aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
