@@ -21,6 +21,7 @@ namespace CuteMediaPlayer
 
         public event EventHandler<CustomTrackItem> AddToPlaylistRequested;
         public event EventHandler<string> TrackRemovedFromPlaylist;
+        public bool IsLibraryPanel { get; set; }
 
         public CustomPlaylistPanel()
         {
@@ -150,7 +151,15 @@ namespace CuteMediaPlayer
 
         private void ShowListIsEmptyLabel()
         {
-            //
+            // hide buttons for Saved Playlists tab
+            if (IsLibraryPanel)
+            {
+                // Always hide these controls in the library tab
+                listEmptyLabel.Visible = false;
+                btnAddSongs.Visible = false;
+                return;
+            }
+
             if (trackItems.Count <= 0)
             {
                 listEmptyLabel.Visible = true;

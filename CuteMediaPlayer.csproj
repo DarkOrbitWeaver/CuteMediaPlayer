@@ -6,17 +6,24 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Platforms>AnyCPU;x86</Platforms>
+	<Platforms>x86</Platforms>
+	<OutputPath>bin\Release\net8.0-windows\publish\</OutputPath>
+	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <ApplicationIcon>Assets\appicon_c.ico</ApplicationIcon>
   </PropertyGroup>
+	
+	<PropertyGroup>
+		<SelfContained>false</SelfContained>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Assets\appfac_x.ico" />
-    <None Remove="Assets\appicon_c.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
+	<ItemGroup>
     <Content Include="Assets\appicon_c.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+	
+	<ItemGroup>
+    <Content Include="Assets\appfac_x.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -72,6 +72,8 @@ namespace CuteMediaPlayer
             // new playlist ui
             InitializeCustomPlaylistControls();
 
+            // hide custom playlists (saved playlist) control buttons
+            customPlaylistsPanel.IsLibraryPanel = true;
 
 
             // 🕒 Timer to update UI elements (seek bar/time label)
@@ -346,6 +348,11 @@ namespace CuteMediaPlayer
                 {
                     volumeBar.Value = 80; // Default value
                 }
+                // restore visualzer disabled statu
+                bool isDisabled = Properties.Settings.Default.DisabledVisualizer;
+                sparkleVisualizer1.DisabledVisualizer = isDisabled;
+
+                UpdateContextMenuItemText();
 
                 // Apply volume to media player
                 if (mediaPlayer != null)
@@ -370,6 +377,8 @@ namespace CuteMediaPlayer
             {
                 SaveAllPlaylists(); // Only saves playlists in allPlaylists
                 Properties.Settings.Default.LastVolume = volumeBar.Value;
+                // other settings
+                Properties.Settings.Default.DisabledVisualizer = sparkleVisualizer1.DisabledVisualizer;
                 Properties.Settings.Default.Save();
             }
             catch (Exception ex)
@@ -457,33 +466,42 @@ namespace CuteMediaPlayer
         // animate girl 
         private void DancingGirlTimer_Tick(object sender, EventArgs e)
         {
-            // if loaded frames successfully
-            if (danceFrames[currentFrameSet].Count > 0)
+
+            bool isDisabled = sparkleVisualizer1.DisabledVisualizer;
+            if (!isDisabled)
             {
-                // if not reached the end of the frames
-                if (currentFrame < danceFrames[currentFrameSet].Count)
+                // if loaded frames successfully
+                if (danceFrames[currentFrameSet].Count > 0)
                 {
-
-                    dancingGirlPictureBox.Image = danceFrames[currentFrameSet][currentFrame];
-                    currentFrame++;
-                    dancingGirlTimer.Interval = 100;
-                }
-                else
-                {
-                    // change dancing set if allowed
-                    if (lastSwitch >= 100)
+                    // if not reached the end of the frames
+                    if (currentFrame < danceFrames[currentFrameSet].Count)
                     {
-                        currentFrameSet = random.Next(danceFrames.Count());
-                        switchFrameSet = false;
-                        lastSwitch = 0;
-                    }
 
-                    // if reached the end restart the animation
-                    currentFrame = 0;
-                    dancingGirlTimer.Interval = 10;
+                        dancingGirlPictureBox.Image = danceFrames[currentFrameSet][currentFrame];
+                        currentFrame++;
+                        dancingGirlTimer.Interval = 100;
+                    }
+                    else
+                    {
+                        // change dancing set if allowed
+                        if (lastSwitch >= 100)
+                        {
+                            currentFrameSet = random.Next(danceFrames.Count());
+                            switchFrameSet = false;
+                            lastSwitch = 0;
+                        }
+
+                        // if reached the end restart the animation
+                        currentFrame = 0;
+                        dancingGirlTimer.Interval = 10;
+                    }
+                    //
+                    lastSwitch++;
                 }
-                //
-                lastSwitch++;
+            }
+            else
+            {
+                dancingGirlPictureBox.Visible = false;
             }
         }
         // to open minimized player
@@ -584,7 +602,7 @@ namespace CuteMediaPlayer
                     }
                 }
 
-        
+
             }
             catch (Exception ex)
             {
@@ -594,6 +612,18 @@ namespace CuteMediaPlayer
 
         }
 
- 
+        private void disableVisualizerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            sparkleVisualizer1.DisabledVisualizer = !sparkleVisualizer1.DisabledVisualizer;
+            UpdateContextMenuItemText();
+        }
+
+        private void UpdateContextMenuItemText()
+        {
+            string disabledText = sparkleVisualizer1.DisabledVisualizer ? "Enable" : "Disable";
+            disableVisualizerToolStripMenuItem.Text = $"{disabledText} Visualizer";
+        }
+
     }
 }

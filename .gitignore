@@ -1,4 +1,6 @@
+.claudiaideconfig
 bin/
 .vs/
 obj/
 .git/
+Output/

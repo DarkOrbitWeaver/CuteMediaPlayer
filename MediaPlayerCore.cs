@@ -110,6 +110,7 @@ namespace CuteMediaPlayer
 
                                     // Show idle visualizer
                                     UpdateVisualizerVisibility();
+                                    OnButtonStatesChanged();
                                 }
 
                                 // Reset audio for next playback

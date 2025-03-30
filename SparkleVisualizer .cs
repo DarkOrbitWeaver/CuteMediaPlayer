@@ -14,6 +14,7 @@ namespace CuteMediaPlayer
 
         public bool IsIdleMode { get; set; } = true;
         private float rotationAngle = 0;
+        public bool DisabledVisualizer { get; set; }
 
 
         // Add these at the top of SparkleVisualizer.cs
@@ -78,7 +79,7 @@ namespace CuteMediaPlayer
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
             // 🎨 Idle animation (rotating star)
-            if (IsIdleMode)
+            if (IsIdleMode || DisabledVisualizer)
             {
                 // Draw wallpaper if available and enabled
                 //if (idleWallpaper != null && useIdleWallpaper)

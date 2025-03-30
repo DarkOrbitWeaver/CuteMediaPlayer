@@ -24,9 +24,10 @@ namespace CuteMediaPlayer
             FormStyling.ApplyRoundedStyle(this);
 
             FormStyling.MakeDraggable(this, this);
-            FormStyling.MakeDraggable(btnPlayPause, this);
-            FormStyling.MakeDraggable(btnNext, this);
-            FormStyling.MakeDraggable(btnPrev, this);
+
+            mainForm.SetupButtonAppearance(btnPlayPause);
+            mainForm.SetupButtonAppearance(btnPrev);
+            mainForm.SetupButtonAppearance(btnNext);
 
             this.TopMost = true; // Ensures the minimized player stays above all windows
 

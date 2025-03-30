@@ -58,5 +58,17 @@ namespace CuteMediaPlayer.Properties {
                 this["MinimizedPlayerClosed"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DisabledVisualizer {
+            get {
+                return ((bool)(this["DisabledVisualizer"]));
+            }
+            set {
+                this["DisabledVisualizer"] = value;
+            }
+        }
     }
 }

@@ -64,6 +64,8 @@
             fileToolStripMenuItem = new ToolStripMenuItem();
             openToolStripMenuItem = new ToolStripMenuItem();
             exitToolStripMenuItem = new ToolStripMenuItem();
+            toolsToolStripMenuItem = new ToolStripMenuItem();
+            disableVisualizerToolStripMenuItem = new ToolStripMenuItem();
             welpToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
             videoPanel = new Panel();
@@ -82,6 +84,8 @@
             customPlaylistPanel = new CustomPlaylistPanel();
             tabLibrary = new TabPage();
             savedPlaylistsButtonContainer = new Panel();
+            btnRefreshPlaylists = new Button();
+            btnNewFolderPlaylist = new Button();
             NewPlaylist = new Button();
             panel1 = new Panel();
             customPlaylistsPanel = new CustomPlaylistPanel();
@@ -130,7 +134,7 @@
             // menuStrip1
             // 
             menuStrip1.BackColor = Color.FromArgb(254, 184, 195);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, welpToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, toolsToolStripMenuItem, welpToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Padding = new Padding(7, 4, 0, 4);
@@ -158,6 +162,19 @@
             exitToolStripMenuItem.Size = new Size(106, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
+            // 
+            // toolsToolStripMenuItem
+            // 
+            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { disableVisualizerToolStripMenuItem });
+            toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
+            toolsToolStripMenuItem.Size = new Size(46, 19);
+            toolsToolStripMenuItem.Text = "Tools";
+            // 
+            // disableVisualizerToolStripMenuItem
+            // 
+            disableVisualizerToolStripMenuItem.Name = "disableVisualizerToolStripMenuItem";
+            disableVisualizerToolStripMenuItem.Size = new Size(67, 22);
+            disableVisualizerToolStripMenuItem.Click += disableVisualizerToolStripMenuItem_Click;
             // 
             // welpToolStripMenuItem
             // 
@@ -335,6 +352,7 @@
             customPlaylistPanel.AutoScroll = true;
             customPlaylistPanel.BackColor = Color.FromArgb(254, 184, 195);
             customPlaylistPanel.Dock = DockStyle.Fill;
+            customPlaylistPanel.IsLibraryPanel = false;
             customPlaylistPanel.Location = new Point(0, 0);
             customPlaylistPanel.Name = "customPlaylistPanel";
             customPlaylistPanel.Size = new Size(353, 387);
@@ -355,6 +373,8 @@
             // 
             // savedPlaylistsButtonContainer
             // 
+            savedPlaylistsButtonContainer.Controls.Add(btnRefreshPlaylists);
+            savedPlaylistsButtonContainer.Controls.Add(btnNewFolderPlaylist);
             savedPlaylistsButtonContainer.Controls.Add(NewPlaylist);
             savedPlaylistsButtonContainer.Dock = DockStyle.Bottom;
             savedPlaylistsButtonContainer.Location = new Point(3, 347);
@@ -362,16 +382,46 @@
             savedPlaylistsButtonContainer.Size = new Size(353, 44);
             savedPlaylistsButtonContainer.TabIndex = 3;
             // 
+            // btnRefreshPlaylists
+            // 
+            btnRefreshPlaylists.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnRefreshPlaylists.BackColor = Color.FromArgb(254, 184, 195);
+            btnRefreshPlaylists.Cursor = Cursors.Hand;
+            btnRefreshPlaylists.Font = new Font("MS PGothic", 12F, FontStyle.Bold);
+            btnRefreshPlaylists.Location = new Point(272, 7);
+            btnRefreshPlaylists.Margin = new Padding(3, 4, 3, 4);
+            btnRefreshPlaylists.Name = "btnRefreshPlaylists";
+            btnRefreshPlaylists.Size = new Size(76, 33);
+            btnRefreshPlaylists.TabIndex = 3;
+            btnRefreshPlaylists.Text = "Refresh";
+            btnRefreshPlaylists.UseVisualStyleBackColor = false;
+            btnRefreshPlaylists.Click += btnRefreshPlaylists_Click;
+            // 
+            // btnNewFolderPlaylist
+            // 
+            btnNewFolderPlaylist.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnNewFolderPlaylist.BackColor = Color.FromArgb(254, 184, 195);
+            btnNewFolderPlaylist.Cursor = Cursors.Hand;
+            btnNewFolderPlaylist.Font = new Font("MS PGothic", 12F, FontStyle.Bold);
+            btnNewFolderPlaylist.Location = new Point(142, 7);
+            btnNewFolderPlaylist.Margin = new Padding(3, 4, 3, 4);
+            btnNewFolderPlaylist.Name = "btnNewFolderPlaylist";
+            btnNewFolderPlaylist.Size = new Size(124, 33);
+            btnNewFolderPlaylist.TabIndex = 2;
+            btnNewFolderPlaylist.Text = "Add Folder";
+            btnNewFolderPlaylist.UseVisualStyleBackColor = false;
+            btnNewFolderPlaylist.Click += btnNewFolderPlaylist_Click;
+            // 
             // NewPlaylist
             // 
             NewPlaylist.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             NewPlaylist.BackColor = Color.FromArgb(254, 184, 195);
             NewPlaylist.Cursor = Cursors.Hand;
             NewPlaylist.Font = new Font("MS PGothic", 12F, FontStyle.Bold);
-            NewPlaylist.Location = new Point(82, 7);
+            NewPlaylist.Location = new Point(18, 7);
             NewPlaylist.Margin = new Padding(3, 4, 3, 4);
             NewPlaylist.Name = "NewPlaylist";
-            NewPlaylist.Size = new Size(201, 33);
+            NewPlaylist.Size = new Size(118, 33);
             NewPlaylist.TabIndex = 1;
             NewPlaylist.Text = "New";
             NewPlaylist.UseVisualStyleBackColor = false;
@@ -399,6 +449,7 @@
             // sparkleVisualizer1
             // 
             sparkleVisualizer1.BackColor = Color.Transparent;
+            sparkleVisualizer1.DisabledVisualizer = false;
             sparkleVisualizer1.Dock = DockStyle.Fill;
             sparkleVisualizer1.Font = new Font("Consolas", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             sparkleVisualizer1.IsIdleMode = true;
@@ -608,10 +659,10 @@
             btnNext.Cursor = Cursors.Hand;
             btnNext.FlatAppearance.BorderSize = 0;
             btnNext.FlatStyle = FlatStyle.Flat;
-            btnNext.Location = new Point(243, 61);
+            btnNext.Location = new Point(243, 62);
             btnNext.Margin = new Padding(3, 4, 3, 4);
             btnNext.Name = "btnNext";
-            btnNext.Size = new Size(72, 68);
+            btnNext.Size = new Size(71, 66);
             btnNext.TabIndex = 3;
             btnNext.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnNext.UseVisualStyleBackColor = false;
@@ -773,5 +824,9 @@
         private Panel currentPlaylistLabelContainer;
         private Label lblCurrentPlaylist;
         private Button AddSongsToCurrentPlaylist;
+        private ToolStripMenuItem toolsToolStripMenuItem;
+        private ToolStripMenuItem disableVisualizerToolStripMenuItem;
+        private Button btnNewFolderPlaylist;
+        private Button btnRefreshPlaylists;
     }
 }

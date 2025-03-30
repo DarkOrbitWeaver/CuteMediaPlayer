@@ -12,7 +12,7 @@ namespace CuteMediaPlayer
 
         private Dictionary<Button, Size> originalSizes = new Dictionary<Button, Size>();
 
-        private void SetupButtonAppearance(Button button)
+        public void SetupButtonAppearance(Button button)
         {
             // Store original size
             originalSizes[button] = button.Size;

@@ -152,6 +152,7 @@ namespace CuteMediaPlayer
         // Call this method when opening a file
         private void UpdateVisualizerVisibility(bool forceRefresh = true)
         {
+            
             // Check if we're playing anything
             bool isPlaying = mediaPlayer?.IsPlaying ?? false;
             bool mediaLoaded = currentTrackIndex >= 0 && currentTrackIndex < playlist.Count;

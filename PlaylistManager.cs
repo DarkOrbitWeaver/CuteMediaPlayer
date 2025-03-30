@@ -24,6 +24,7 @@ namespace CuteMediaPlayer
         {
             public string Name { get; set; }
             public List<string> Tracks { get; set; } = new List<string>();
+            public string FolderPath { get; set; }
         }
 
         private Playlist SelectPlaylistDialog(string promptText = "")
@@ -64,13 +65,18 @@ namespace CuteMediaPlayer
 
         private void SaveAllPlaylists()
         {
-            // Create folder if missing
             Directory.CreateDirectory(playlistsFolder);
 
-            // Save each playlist
             foreach (var pl in allPlaylists)
             {
-                File.WriteAllLines(Path.Combine(playlistsFolder, $"{pl.Name}.m3u"), pl.Tracks);
+                var lines = new List<string>();
+                if (!string.IsNullOrEmpty(pl.FolderPath))
+                {
+                    lines.Add($"#FOLDER:{pl.FolderPath}");
+                }
+                lines.AddRange(pl.Tracks);
+
+                File.WriteAllLines(Path.Combine(playlistsFolder, $"{pl.Name}.m3u"), lines);
             }
         }
 
@@ -84,14 +90,33 @@ namespace CuteMediaPlayer
             {
                 try
                 {
+                    var lines = File.ReadAllLines(file);
                     var pl = new Playlist
                     {
-                        // Trim the playlist name to remove leading/trailing spaces
                         Name = Path.GetFileNameWithoutExtension(file).Trim(),
-                        Tracks = File.ReadAllLines(file)
-                                      .Where(line => File.Exists(line))
-                                      .ToList()
+                        Tracks = new List<string>()
                     };
+
+                    // --- ADD FOLDER HANDLING START ---
+                    foreach (var line in lines)
+                    {
+                        if (line.StartsWith("#FOLDER:"))
+                        {
+                            pl.FolderPath = line.Replace("#FOLDER:", "").Trim();
+                            if (Directory.Exists(pl.FolderPath))
+                            {
+                                pl.Tracks = Directory.GetFiles(pl.FolderPath)
+                                                    .Where(f => IsMediaFile(f))
+                                                    .ToList();
+                                break; // Stop processing other lines for folder playlists
+                            }
+                        }
+                        else if (File.Exists(line))
+                        {
+                            pl.Tracks.Add(line);
+                        }
+                    }
+
                     allPlaylists.Add(pl);
                 }
                 catch (Exception ex)
@@ -472,6 +497,7 @@ namespace CuteMediaPlayer
                     currentPlaylist.Tracks.Remove(trackPath);
                     SaveAllPlaylists(); // 💾 Save to file
                     SyncPlaylistToUI(); // 🔄 Update UI
+                    LoadAllPlaylists(); // Reload all playlists properly
                 }
             };
         }
@@ -575,6 +601,73 @@ namespace CuteMediaPlayer
             {
                 // No playlist loaded
                 lblCurrentPlaylist.Text = "";
+            }
+        }
+
+
+        private void btnNewFolderPlaylist_Click(object sender, EventArgs e)
+        {
+            using (var folderDialog = new FolderBrowserDialog())
+            {
+                if (folderDialog.ShowDialog() == DialogResult.OK)
+                {
+                    var folderPath = folderDialog.SelectedPath;
+                    var folderName = new DirectoryInfo(folderPath).Name;
+
+                    // Simple playlist creation
+                    var newPl = new Playlist
+                    {
+                        Name = $"[Folder] {folderName}",
+                        FolderPath = folderPath,
+                        Tracks = Directory.GetFiles(folderPath)
+                                          .Where(f => IsMediaFile(f))
+                                          .ToList()
+                    };
+
+                    allPlaylists.Add(newPl);
+                    customPlaylistsPanel.AddTrack($"PLAYLIST:{newPl.Name}|{newPl.Tracks.Count}");
+                    SaveAllPlaylists();
+                }
+            }
+        }
+
+        private bool IsMediaFile(string path)
+        {
+            var exts = new[] { ".mp3", ".wav", ".m4a", ".aac", ".flac", ".ogg", ".wma" };
+            return exts.Contains(Path.GetExtension(path).ToLower());
+        }
+
+        private void btnRefreshPlaylists_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Refresh all folder-based playlists
+                foreach (var pl in allPlaylists)
+                {
+                    if (!string.IsNullOrEmpty(pl.FolderPath) && Directory.Exists(pl.FolderPath))
+                    {
+                        // Reload files from folder
+                        pl.Tracks = Directory.GetFiles(pl.FolderPath)
+                                            .Where(f => IsMediaFile(f))
+                                            .ToList();
+                    }
+                }
+
+                // Update UI if current playlist is a folder playlist
+                if (!string.IsNullOrEmpty(currentPlaylist.FolderPath))
+                {
+                    LoadAllPlaylists(); //
+                    SyncPlaylistToUI();
+                    UpdatePlaylistTitleDisplay();
+                }
+
+                // Save updated playlists
+                SaveAllPlaylists(); // remove this line if it conflicts with saving mechanisms
+                MessageBox.Show("Playlists refreshed!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error refreshing playlists: {ex.Message}");
             }
         }
 

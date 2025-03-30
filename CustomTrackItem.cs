@@ -315,9 +315,9 @@ namespace CuteMediaPlayer
         public event EventHandler TrackRemoved;
 
         // 🗂️ Playlist deletion logic
-private void DeletePlaylistItem_Click(object sender, EventArgs e)
-{
-    Debug.WriteLine($"Attempting to delete playlist: '{this.Title}'");
+        private void DeletePlaylistItem_Click(object sender, EventArgs e)
+        {
+            Debug.WriteLine($"Attempting to delete playlist: '{this.Title}'");
             DialogResult result = MessageBox.Show(
                 $"Delete playlist '{this.Title}'?",
                 "Confirm",
@@ -353,6 +353,8 @@ private void DeletePlaylistItem_Click(object sender, EventArgs e)
         {
             TrackRemoved?.Invoke(this, e);
         }
+
+
         // small fire (playing indicator Animation)
 
         //private void LoadAnimationAssets()
