@@ -299,7 +299,7 @@ namespace CuteMediaPlayer
         {
             // 🚨 Confirm deletion with track name
             DialogResult result = MessageBox.Show(
-                $"Delete '{this.Title}' from playlist?",
+                $"Remove '{this.Title}' from playlist?",
                 "Confirm",
                 MessageBoxButtons.YesNo
             );
